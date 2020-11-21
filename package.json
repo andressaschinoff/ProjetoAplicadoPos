@@ -1,0 +1,10 @@
+{
+  "name": "back-feira-na-mao",
+  "version": "1.0.0",
+  "main": "app.js",
+  "author": "Andressa Schinoff",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
