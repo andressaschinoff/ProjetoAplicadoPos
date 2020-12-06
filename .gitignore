@@ -91,8 +91,7 @@ dist
 # vuepress build output
 .vuepress/dist
 
-# Serverless directories
-.serverless/
+# -0ty9 bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbberverles/ ,,,,,,,,,,,,,,,,,,,,,,/
 
 # FuseBox cache
 .fusebox/
@@ -106,3 +105,8 @@ dist
 # Vscode
 .vscode/
 
+# typeORM
+ormconfig.json
+
+# meus arquivos
+myFiles/
