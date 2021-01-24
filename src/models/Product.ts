@@ -1,21 +1,51 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+  CreateDateColumn,
+  BeforeInsert,
+  BeforeUpdate,
+} from 'typeorm';
+import { Type } from '../enum/Type';
 
-@Entity('fm_product')
-class Product {
-  @PrimaryGeneratedColumn({ name: 'id_product', type: 'uuid' })
+@Entity('product')
+export default class Product {
+  @PrimaryGeneratedColumn('uuid')
   id: string;
-  @Column({ name: 'nm_product' })
-  name: string;
-  @Column({ name: 'vl_product', type: 'money' })
-  price: number;
-  @Column({ name: 'tp_product' })
-  type: string;
-  @Column({ name: 'ds_product' })
-  description: string;
-  @Column({ name: 'dt_inc', type: 'time with time zone' })
-  dateInc: Date;
-  @Column({ name: 'dt_alt', type: 'time with time zone' })
-  dateAlt: Date;
-}
 
-export default Product;
+  @Column()
+  name: string;
+
+  @Column({ type: 'float' })
+  price: number;
+
+  @Column({ nullable: true })
+  description: string;
+
+  @CreateDateColumn({
+    name: 'create_at',
+  })
+  createAt: Date;
+
+  @UpdateDateColumn({
+    name: 'update_at',
+  })
+  updateAt: Date;
+
+  @Column({
+    type: 'enum',
+    enum: Type,
+  })
+  type: Type;
+
+  @BeforeInsert()
+  createDates() {
+    this.createAt = new Date();
+  }
+
+  @BeforeUpdate()
+  updateDates() {
+    this.updateAt = new Date();
+  }
+}

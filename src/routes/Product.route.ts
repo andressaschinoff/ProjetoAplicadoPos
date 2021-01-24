@@ -1,34 +1,38 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { getCustomRepository } from 'typeorm';
-import { isUuid } from 'uuidv4';
 import dateFormat from 'dateformat';
 import { parseISO } from 'date-fns';
 
-import ProductRepository from '../repositories/ProductRepository';
-import CreateProductService from '../services/ProductService';
+import ProductRepository from '../repositories/Product.repository';
+import CreateProductService from '../services/Product.service';
 
 const routes = Router();
 
 function logRequest(request: Request, _response: Response, next: NextFunction) {
   const { method, originalUrl } = request;
-  console.log(method + ': ' + originalUrl);
+  console.info(method + ': ' + originalUrl);
   return next();
 }
 
 routes.use(logRequest);
 
 routes.get('/', async (_request, response) => {
-  const productRepository = getCustomRepository(ProductRepository);
-  const products = await productRepository.find();
+  try {
+    const productRepository = getCustomRepository(ProductRepository);
 
-  return response.json(products);
+    const products = await productRepository.find();
+
+    return response.json(products);
+  } catch (err) {
+    // log erro
+    console.error(err);
+    return response.status(400).json({ error: err.message });
+  }
 });
 
 routes.post('/', async (request, response) => {
   try {
     const { name, type, price, description } = request.body;
-    const date = new Date();
-    const parsedDate = parseISO(dateFormat(date, 'isoDateTime'));
 
     const newProduct = new CreateProductService();
 
@@ -37,62 +41,51 @@ routes.post('/', async (request, response) => {
       type,
       price,
       description,
-      dateInc: parsedDate,
-      dateAlt: parsedDate,
     });
 
     return response.json(product);
   } catch (err) {
     // log erro
-    console.log(err);
+    console.error(err);
     return response.status(400).json({ error: err.message });
   }
 });
 
-routes.get('/:id', async (request, response) => {
+routes.get('/id/:id', async (request, response) => {
   try {
     const { id } = request.params;
 
     const productRepository = getCustomRepository(ProductRepository);
-    const product = await productRepository.findOne({
-      where: { id },
-    });
+    const product = await productRepository.findByIds([id]);
 
     return response.json(product);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return response.status(400).json({ error: err.message });
   }
 });
 
-routes.get('/filter/?description', async (request, response) => {
+routes.get('/filter', async (request, response) => {
   try {
-    const { description } = request.query;
+    const { name, description, type } = request.query;
+    const filter: string = description
+      ? String(description)
+      : name
+      ? String(name)
+      : type
+      ? String(type)
+      : '';
 
-    const filter: string = description ? String(description) : '';
+    const key = name ? 'name' : 'description';
 
     const productRepository = getCustomRepository(ProductRepository);
-    const products = await productRepository.findByDescription(filter);
+    const products = type
+      ? await productRepository.findByType(filter)
+      : await productRepository.findBy(key, filter);
 
-    return products;
+    return response.json(products);
   } catch (err) {
-    console.log(err);
-    return response.status(400).json({ error: err.message });
-  }
-});
-
-routes.get('/filter/?type', async (request, response) => {
-  try {
-    const { type } = request.query;
-
-    const filter: string = type ? String(type) : '';
-
-    const productRepository = getCustomRepository(ProductRepository);
-    const products = await productRepository.findByType(filter);
-
-    return products;
-  } catch (err) {
-    console.log(err);
+    console.error(err);
     return response.status(400).json({ error: err.message });
   }
 });
@@ -106,19 +99,20 @@ routes.put('/:id', async (request, response) => {
     const parsedDate = parseISO(dateFormat(date, 'isoDateTime'));
 
     const productRepository = getCustomRepository(ProductRepository);
+
     await productRepository.update(id, {
       name,
       type,
       price,
       description,
-      dateAlt: parsedDate,
+      updateAt: parsedDate,
     });
 
-    const updateProduct = await productRepository.findOne({ where: { id } });
+    const updateProduct = await productRepository.findByIds([id]);
 
     return response.json(updateProduct);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return response.status(400).json({ error: err.message });
   }
 });
@@ -132,7 +126,7 @@ routes.delete('/:id', async (request, response) => {
 
     return response.status(204).json();
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return response.status(400).json({ error: err.message });
   }
 });
