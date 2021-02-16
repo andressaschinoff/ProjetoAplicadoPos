@@ -2,14 +2,11 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  ManyToOne,
   BeforeInsert,
   BeforeUpdate,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-
-import Fair from './Fair';
 
 @Entity('client')
 export default class User {

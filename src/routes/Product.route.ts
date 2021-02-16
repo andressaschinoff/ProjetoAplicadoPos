@@ -32,7 +32,7 @@ routes.get('/', async (_request, response) => {
 
 routes.post('/', async (request, response) => {
   try {
-    const { name, type, price, description } = request.body;
+    const { name, type, price, description, fair } = request.body;
 
     const newProduct = new CreateProductService();
 
@@ -41,6 +41,7 @@ routes.post('/', async (request, response) => {
       type,
       price,
       description,
+      fair,
     });
 
     return response.json(product);
@@ -93,10 +94,10 @@ routes.get('/filter', async (request, response) => {
 routes.put('/:id', async (request, response) => {
   try {
     const { id } = request.params;
-    const { name, type, description, price } = request.body;
+    const { name, type, description, price, fair } = request.body;
 
     const date = new Date();
-    const parsedDate = parseISO(dateFormat(date, 'isoDateTime'));
+    // const parsedDate = parseISO(dateFormat(date, 'isoDateTime'));
 
     const productRepository = getCustomRepository(ProductRepository);
 
@@ -105,7 +106,7 @@ routes.put('/:id', async (request, response) => {
       type,
       price,
       description,
-      updateAt: parsedDate,
+      fair,
     });
 
     const updateProduct = await productRepository.findByIds([id]);

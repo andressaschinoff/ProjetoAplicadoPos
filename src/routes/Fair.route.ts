@@ -40,7 +40,7 @@ routes.post('/', async (request, response) => {
       weekDay,
       deliveryPrice,
       moneySign,
-      products,
+      types,
     } = request.body;
 
     const newFair = new CreateFairService();
@@ -55,7 +55,7 @@ routes.post('/', async (request, response) => {
       weekDay,
       deliveryPrice,
       moneySign,
-      products,
+      types,
     });
 
     return response.json(fair);
@@ -132,7 +132,7 @@ routes.put('/:id', async (request, response) => {
       weekDay,
       deliveryPrice,
       moneySign,
-      products,
+      types,
     } = request.body;
 
     const fairRepository = getCustomRepository(FairRepository);
@@ -147,6 +147,7 @@ routes.put('/:id', async (request, response) => {
       weekDay,
       deliveryPrice,
       moneySign,
+      types,
     });
 
     const updateFair = await fairRepository.findByIds([id]);

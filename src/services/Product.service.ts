@@ -1,6 +1,7 @@
 import { getCustomRepository } from 'typeorm';
 
 import { Type } from '../enum/Type';
+import Fair from '../models/Fair';
 import Product from '../models/Product';
 import ProductRepository from '../repositories/Product.repository';
 
@@ -9,6 +10,7 @@ interface Request {
   price: number;
   description: string;
   type: Type;
+  fair: Fair;
 }
 
 class CreateProductService {
@@ -17,6 +19,7 @@ class CreateProductService {
     price,
     description,
     type,
+    fair,
   }: Request): Promise<Product> {
     const productsRepository = getCustomRepository(ProductRepository);
 
@@ -25,6 +28,7 @@ class CreateProductService {
       price,
       description,
       type,
+      fair,
     });
     await productsRepository.save(product);
     return product;
