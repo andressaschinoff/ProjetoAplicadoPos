@@ -7,6 +7,7 @@ import {
   BeforeUpdate,
   CreateDateColumn,
   UpdateDateColumn,
+  JoinColumn,
 } from 'typeorm';
 
 import Fair from './Fair';
@@ -41,7 +42,8 @@ export default class User {
   })
   updateAt: Date;
 
-  @ManyToOne(() => Fair, fair => fair.id)
+  @ManyToOne(() => Fair, fair => fair.users, { nullable: false })
+  @JoinColumn({ name: 'fair_id' })
   fair: Fair;
 
   @BeforeInsert()

@@ -2,15 +2,15 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  ManyToMany,
   CreateDateColumn,
   UpdateDateColumn,
-  JoinTable,
   BeforeInsert,
   BeforeUpdate,
+  OneToMany,
 } from 'typeorm';
 import { Type } from '../enum/Type';
 import Product from './Product';
+import User from './User';
 
 @Entity('fair')
 export default class Fair {
@@ -44,6 +44,15 @@ export default class Fair {
   @Column({ name: 'money_sign', type: 'float' })
   moneySign: number;
 
+  @Column({ type: 'enum', array: true, enum: Type })
+  types: Type[];
+
+  @OneToMany(() => Product, product => product.fair)
+  products: Product[];
+
+  @OneToMany(() => User, user => user.fair)
+  users: User[];
+
   @CreateDateColumn({
     name: 'date_create',
   })
@@ -53,20 +62,6 @@ export default class Fair {
     name: 'date_update',
   })
   updateAt: Date;
-
-  // @ManyToMany(() => Product, product => product.id, { cascade: true })
-  // @JoinTable({
-  //   name: 'fair_products',
-  //   joinColumn: {
-  //     name: 'id',
-  //     referencedColumnName: 'id',
-  //   },
-  //   inverseJoinColumn: {
-  //     name: 'id',
-  //     referencedColumnName: 'id',
-  //   },
-  // })
-  // products: Product[];
 
   @BeforeInsert()
   createDates() {
