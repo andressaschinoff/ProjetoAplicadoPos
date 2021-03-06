@@ -7,11 +7,12 @@ import {
   BeforeInsert,
   BeforeUpdate,
   ManyToOne,
-  JoinTable,
   JoinColumn,
+  OneToOne,
 } from 'typeorm';
 import { Type } from '../enum/Type';
 import Fair from './Fair';
+import Products from './Products';
 
 @Entity('product')
 export default class Product {
@@ -33,6 +34,9 @@ export default class Product {
   @ManyToOne(() => Fair, fair => fair.products, { nullable: false })
   @JoinColumn({ name: 'fair_id' })
   fair: Fair;
+
+  @OneToOne(() => Products, products => products.product)
+  products: Products;
 
   @CreateDateColumn({
     name: 'create_at',

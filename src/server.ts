@@ -5,6 +5,7 @@ import { fairRoute } from './routes/Fair.route';
 import { typeRoute } from './routes/Type.route';
 import { userRoute } from './routes/User.route';
 import { clientRoute } from './routes/Client.route';
+import { trollerRoute } from './routes/Troller.route';
 
 import './database';
 
@@ -17,6 +18,7 @@ app.use('/fair', fairRoute);
 app.use('/type', typeRoute);
 app.use('/user', userRoute);
 app.use('/client', clientRoute);
+app.use('/troller', trollerRoute);
 
 app.listen(3001, () => {
   console.log('Server started on port 3001');
