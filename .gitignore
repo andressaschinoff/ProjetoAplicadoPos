@@ -110,3 +110,6 @@ ormconfig.json
 
 # meus arquivos
 myFiles/
+
+# passport config
+passportconfig.ts
