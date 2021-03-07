@@ -20,13 +20,16 @@ export default class User {
   @Column()
   name: string;
 
+  @Column()
+  role: string;
+
   @Column({ unique: true })
   cpf: string;
 
   @Column({ unique: true })
   email: string;
 
-  @Column({})
+  @Column()
   password: string;
 
   @Column()
