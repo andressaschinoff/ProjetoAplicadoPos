@@ -66,4 +66,9 @@ async function findClientOrUser(
   return { auth: false, message: 'Invalid user' };
 }
 
+routes.get('/logout', function (req, res) {
+  req.logout();
+  res.redirect('/');
+});
+
 export { routes as loginRoute };

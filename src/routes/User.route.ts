@@ -1,3 +1,4 @@
+import { genSalt, hash } from 'bcrypt';
 import { Router, Request, Response, NextFunction } from 'express';
 import { getRepository } from 'typeorm';
 
@@ -34,14 +35,34 @@ routes.post('/', async (request, response) => {
 
     const newUser = new CreateUserService();
 
-    const user = await newUser.execute({
+    const currentUser = {
       name,
       cpf,
       email,
       password,
       telephone,
       fair,
+    };
+
+    await genSalt(10, (err, salt) => {
+      if (err) {
+        return response.status(424).json({
+          message: 'Error to encrypt password, please try again later',
+          err,
+        });
+      }
+      hash(password, salt, (err, hash) => {
+        if (err) {
+          return response.status(424).json({
+            message: 'Error to encrypt password, please try again later',
+            err,
+          });
+        }
+        currentUser.password = hash;
+      });
     });
+
+    const user = await newUser.execute(currentUser);
 
     return response.json(user);
   } catch (err) {
