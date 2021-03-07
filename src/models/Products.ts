@@ -1,45 +1,41 @@
 import {
   Entity,
   Column,
-  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+  CreateDateColumn,
   BeforeInsert,
   BeforeUpdate,
-  CreateDateColumn,
-  UpdateDateColumn,
-  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  ManyToMany,
 } from 'typeorm';
+import Product from './Product';
 import Troller from './Troller';
 
-@Entity('client')
-export default class User {
+@Entity('products')
+export default class Products {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
-  name: string;
+  quantity: number;
 
-  @Column({ unique: true })
-  cpf: string;
+  @Column({ type: 'float' })
+  total: number;
 
-  @Column({ unique: true })
-  email: string;
+  @OneToOne(() => Product, product => product.products)
+  product: Product;
 
-  @Column({})
-  password: string;
-
-  @Column()
-  telephone: string;
-
-  // @OneToMany(() => Troller, troller => troller.client)
+  @ManyToMany(() => Troller, troller => troller.products)
   trollers: Troller[];
 
   @CreateDateColumn({
-    name: 'date_create',
+    name: 'create_at',
   })
   createAt: Date;
 
   @UpdateDateColumn({
-    name: 'date_update',
+    name: 'update_at',
   })
   updateAt: Date;
 
