@@ -113,3 +113,6 @@ myFiles/
 
 # passport config
 passportconfig.ts
+
+#keys
+*.key

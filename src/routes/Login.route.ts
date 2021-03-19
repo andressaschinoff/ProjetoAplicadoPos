@@ -1,12 +1,17 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import { sign } from 'jsonwebtoken';
+import { Router, Request, Response, NextFunction, response } from 'express';
+import { sign, verify } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { getRepository } from 'typeorm';
 import Client from '../models/Client';
 import fs from 'fs';
+var path = require('path');
 import User from '../models/User';
 
 const routes = Router();
+const keys = {
+  private: path.resolve('jwtRS256.key'),
+  public: path.resolve('jwtRS256.key.pub'),
+};
 
 function logRequest(request: Request, _response: Response, next: NextFunction) {
   const { method, originalUrl } = request;
@@ -16,11 +21,11 @@ function logRequest(request: Request, _response: Response, next: NextFunction) {
 
 routes.use(logRequest);
 
-routes.post('/login', async (req, res) => {
-  const { username, password, role } = req.body;
+routes.post('/', async (req, res) => {
+  const { email, password, role } = req.body;
 
-  if (req.body.username && req.body.password) {
-    const resp = await findClientOrUser(role, username, password);
+  if (email && password && role) {
+    const resp = await findClientOrUser(role, email, password);
     return resp.auth
       ? res.json({ token: resp.token })
       : res.status(401).json(resp.message);
@@ -29,41 +34,42 @@ routes.post('/login', async (req, res) => {
   return res.status(401).json({ message: 'Empty user' });
 });
 
-async function findClientOrUser(
-  role: string,
-  username: string,
-  password: string,
-) {
-  let finded: User | Client | undefined;
+async function findClientOrUser(role: string, email: string, password: string) {
+  try {
+    let finded: User | Client | undefined;
 
-  if (role === 'client') {
-    const Repository = getRepository(Client);
-    finded = await Repository.findOne({
-      where: { name: username, role: role },
-    });
-  } else {
-    const Repository = getRepository(User);
-    finded = await Repository.findOne({
-      where: { name: username, role: role },
-    });
-  }
-
-  if (!!finded) {
-    const pwdMatches = bcrypt.compareSync(password, finded.password);
-
-    var privateKey = fs.readFileSync('./private.key', 'utf-8');
-
-    if (pwdMatches) {
-      var token = sign({ role: finded.role }, privateKey, {
-        expiresIn: 300,
-        algorithm: 'RS256',
+    if (role === 'client') {
+      const Repository = getRepository(Client);
+      finded = await Repository.findOne({
+        where: { email: email },
       });
-
-      return { auth: true, token: token };
+    } else {
+      const Repository = getRepository(User);
+      finded = await Repository.findOne({
+        where: { email: email },
+      });
     }
-    return { auth: false, message: 'Incorrect password' };
+
+    if (!!finded) {
+      const pwdMatches = bcrypt.compareSync(password, finded.password);
+
+      var privateKey = fs.readFileSync(keys.private, 'utf-8');
+
+      if (pwdMatches) {
+        var token = sign({ ...finded }, privateKey, {
+          expiresIn: 300,
+          algorithm: 'RS256',
+        });
+
+        return { auth: true, token: token };
+      }
+      return { auth: false, message: 'Incorrect password' };
+    }
+    return { auth: false, message: 'Invalid user' };
+  } catch (err) {
+    console.log(err);
+    return { auth: false, message: err };
   }
-  return { auth: false, message: 'Invalid user' };
 }
 
 routes.get('/logout', function (req, res) {

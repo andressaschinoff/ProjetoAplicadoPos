@@ -6,7 +6,6 @@ import {
   BeforeUpdate,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
 } from 'typeorm';
 import Troller from './Troller';
 
@@ -17,9 +16,6 @@ export default class User {
 
   @Column()
   name: string;
-
-  @Column()
-  role: string;
 
   @Column({ unique: true })
   cpf: string;

@@ -32,9 +32,6 @@ routes.get('/', async (_request, response) => {
 routes.post('/', async (request, response) => {
   try {
     const { name, cpf, email, password, telephone, fair } = request.body;
-
-    const newUser = new CreateUserService();
-
     const currentUser = {
       name,
       cpf,
@@ -43,28 +40,21 @@ routes.post('/', async (request, response) => {
       telephone,
       fair,
     };
+    let id = '';
 
-    await genSalt(10, (err, salt) => {
-      if (err) {
-        return response.status(424).json({
-          message: 'Error to encrypt password, please try again later',
-          err,
-        });
-      }
-      hash(password, salt, (err, hash) => {
-        if (err) {
-          return response.status(424).json({
-            message: 'Error to encrypt password, please try again later',
-            err,
-          });
-        }
+    const newUser = new CreateUserService();
+    await genSalt(10, async (_err, salt) => {
+      hash(password, salt, async (_err, hash) => {
         currentUser.password = hash;
+        const user = await newUser.execute(currentUser);
+        id = user.id;
       });
     });
 
-    const user = await newUser.execute(currentUser);
+    const userRepository = getRepository(User);
+    const findUser = await userRepository.findByIds([id]);
 
-    return response.json(user);
+    return response.json(findUser);
   } catch (err) {
     // log erro
     console.error(err);
