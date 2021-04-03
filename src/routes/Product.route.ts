@@ -30,6 +30,22 @@ routes.get('/', async (_request, response) => {
   }
 });
 
+routes.get('/:fair', async (request, response) => {
+  try {
+    const { fair } = request.params;
+
+    const productRepository = getCustomRepository(ProductRepository);
+
+    const products = await productRepository.find({ where: { fair: fair } });
+
+    return response.json(products);
+  } catch (err) {
+    // log erro
+    console.error(err);
+    return response.status(400).json({ error: err.message });
+  }
+});
+
 routes.post('/', async (request, response) => {
   try {
     const { name, type, price, description, fair } = request.body;

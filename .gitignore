@@ -116,3 +116,5 @@ passportconfig.ts
 
 #keys
 *.key
+
+.vscode

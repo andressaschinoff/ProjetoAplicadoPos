@@ -39,21 +39,23 @@ async function findClientOrUser(role: string, email: string, password: string) {
     let finded: User | Client | undefined;
 
     if (role === 'client') {
-      const Repository = getRepository(Client);
-      finded = await Repository.findOne({
-        where: { email: email },
-      });
+      finded = await getRepository(Client)
+        .createQueryBuilder('client')
+        .where('client.email = :email', { email: email })
+        .addSelect('client.password')
+        .getOne();
     } else {
-      const Repository = getRepository(User);
-      finded = await Repository.findOne({
-        where: { email: email },
-      });
+      finded = await getRepository(User)
+        .createQueryBuilder('user')
+        .where('user.email = :email', { email: email })
+        .addSelect('user.password')
+        .getOne();
     }
 
     if (!!finded) {
       const pwdMatches = bcrypt.compareSync(password, finded.password);
 
-      var privateKey = fs.readFileSync(keys.private, 'utf-8');
+      const privateKey = fs.readFileSync(keys.private, 'utf-8');
 
       if (pwdMatches) {
         var token = sign({ ...finded }, privateKey, {

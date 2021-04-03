@@ -26,7 +26,7 @@ export default class User {
   @Column({ unique: true })
   email: string;
 
-  @Column()
+  @Column({ select: false })
   password: string;
 
   @Column()
@@ -42,7 +42,7 @@ export default class User {
   })
   updateAt: Date;
 
-  @ManyToOne(() => Fair, fair => fair.users, { nullable: false })
+  @ManyToOne(() => Fair, fair => fair.users, { nullable: true })
   @JoinColumn({ name: 'fair_id' })
   fair: Fair;
 

@@ -32,29 +32,17 @@ routes.get('/', async (_request, response) => {
 routes.post('/', async (request, response) => {
   try {
     const { name, cpf, email, password, telephone, fair } = request.body;
-    const currentUser = {
+
+    const userService = new CreateUserService();
+    const newUser = await userService.execute({
       name,
       cpf,
       email,
       password,
       telephone,
       fair,
-    };
-    let id = '';
-
-    const newUser = new CreateUserService();
-    await genSalt(10, async (_err, salt) => {
-      hash(password, salt, async (_err, hash) => {
-        currentUser.password = hash;
-        const user = await newUser.execute(currentUser);
-        id = user.id;
-      });
     });
-
-    const userRepository = getRepository(User);
-    const findUser = await userRepository.findByIds([id]);
-
-    return response.json(findUser);
+    return response.json(newUser);
   } catch (err) {
     // log erro
     console.error(err);
@@ -83,14 +71,35 @@ routes.put('/:id', async (request, response) => {
 
     const userRepository = getRepository(User);
 
-    await userRepository.update(id, {
+    const currentUser = {
       name,
       cpf,
       email,
       password,
       telephone,
       fair,
+    };
+    await genSalt(10, async (_err, salt) => {
+      hash(password, salt, async (_err, hash) => {
+        currentUser.password = hash;
+        await userRepository.update(id, {
+          name: currentUser.name,
+          cpf: currentUser.cpf,
+          email: currentUser.email,
+          password: currentUser.password,
+          telephone: currentUser.telephone,
+        });
+      });
     });
+
+    // await userRepository.update(id, {
+    //   name,
+    //   cpf,
+    //   email,
+    //   password,
+    //   telephone,
+    //   fair,
+    // });
 
     const updateUser = await userRepository.findByIds([id]);
 

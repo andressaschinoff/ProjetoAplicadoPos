@@ -14,21 +14,6 @@ function logRequest(request: Request, _response: Response, next: NextFunction) {
   return next();
 }
 
-async function encryptation(password: string) {
-  const encrypting = await genSalt(10, (err, salt) => {
-    if (err) {
-      return err;
-    }
-    hash(password, salt, (err, hash) => {
-      if (err) {
-        return err;
-      }
-      return hash;
-    });
-  });
-  return encrypting;
-}
-
 routes.use(logRequest);
 
 routes.get('/', async (_request, response) => {
@@ -49,36 +34,17 @@ routes.post('/', async (request, response) => {
   try {
     const { name, cpf, email, password, telephone } = request.body;
 
-    const newClient = new CreateClientService();
-    const currentClient = {
+    const clientService = new CreateClientService();
+
+    const newClient = await clientService.execute({
       name,
       cpf,
       email,
       password,
       telephone,
-    };
-
-    await genSalt(10, (err, salt) => {
-      if (err) {
-        return response.status(424).json({
-          message: 'Error to encrypt password, please try again later',
-          err,
-        });
-      }
-      hash(password, salt, (err, hash) => {
-        if (err) {
-          return response.status(424).json({
-            message: 'Error to encrypt password, please try again later',
-            err,
-          });
-        }
-        currentClient.password = hash;
-      });
     });
 
-    const client = await newClient.execute(currentClient);
-
-    return response.json(client);
+    return response.json(newClient);
   } catch (err) {
     // log erro
     console.error(err);

@@ -1,6 +1,9 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Request, Response, NextFunction, request } from 'express';
 import { getRepository } from 'typeorm';
+import Client from '../models/Client';
+import Products from '../models/Products';
 import Troller from '../models/Troller';
+import CreateProductsService from '../services/Products.service';
 
 import CreateTrollerService from '../services/Troller.service';
 
@@ -16,14 +19,11 @@ routes.use(logRequest);
 
 routes.post('/', async (request, response) => {
   try {
-    const { products, client } = request.body;
+    const req = request.body;
 
     const newTroller = new CreateTrollerService();
 
-    const troller = await newTroller.execute({
-      products,
-      client,
-    });
+    const troller = await newTroller.execute({ ...req });
 
     return response.json(troller);
   } catch (err) {
@@ -50,12 +50,38 @@ routes.get('/:id', async (request, response) => {
 routes.put('/:id', async (request, response) => {
   try {
     const { id } = request.params;
-    const { products } = request.body;
+    const {
+      products,
+      client,
+      active,
+    }: {
+      products?: Products[];
+      client?: Client;
+      active?: boolean;
+    } = request.body;
+
+    const productsService = new CreateProductsService();
+    const newProducts: Products[] = [];
+    const newTroller = { products, active, client };
+
+    if (products !== undefined) {
+      for (let i = 0; i < products.length; i++) {
+        const currentProduct = products[i];
+        const newProduct = await productsService.execute({
+          product: currentProduct.product,
+          quantity: currentProduct.quantity,
+        });
+        console.log(newProduct);
+        newProducts.push(newProduct);
+      }
+      newTroller.products = newProducts;
+      console.log(newProducts);
+    }
 
     const trollerRepository = getRepository(Troller);
 
     await trollerRepository.update(id, {
-      products,
+      ...newTroller,
     });
 
     const updateTroller = await trollerRepository.findByIds([id]);

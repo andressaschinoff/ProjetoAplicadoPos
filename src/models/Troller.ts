@@ -20,13 +20,13 @@ export default class Troller {
   @Column({ type: 'float', default: 0 })
   total: number;
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   active: boolean;
 
-  @ManyToMany(() => Products, products => products.trollers)
+  @ManyToMany(() => Products, products => products.trollers, { nullable: true })
   products: Products[];
 
-  @ManyToOne(() => Client, client => client.trollers)
+  @ManyToOne(() => Client, client => client.trollers, { nullable: true })
   client: Client;
 
   @CreateDateColumn({

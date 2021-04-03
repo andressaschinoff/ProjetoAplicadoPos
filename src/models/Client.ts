@@ -6,6 +6,7 @@ import {
   BeforeUpdate,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import Troller from './Troller';
 
@@ -23,13 +24,13 @@ export default class User {
   @Column({ unique: true })
   email: string;
 
-  @Column({})
+  @Column({ select: false })
   password: string;
 
   @Column()
   telephone: string;
 
-  // @OneToMany(() => Troller, troller => troller.client)
+  @OneToMany(() => Troller, troller => troller.client)
   trollers: Troller[];
 
   @CreateDateColumn({

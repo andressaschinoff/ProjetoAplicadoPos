@@ -2,15 +2,9 @@ import 'reflect-metadata';
 import express from 'express';
 import passport from 'passport';
 import { googleConfig } from './configs/passportconfig';
-import { productRoute } from './routes/Product.route';
-import { fairRoute } from './routes/Fair.route';
-import { typeRoute } from './routes/Type.route';
-import { userRoute } from './routes/User.route';
-import { trollerRoute } from './routes/Troller.route';
-import { clientRoute } from './routes/Client.route';
-import { loginRoute } from './routes/Login.route';
 import GooglePassport from 'passport-google-oauth20';
 import BearerPassport from 'passport-http-bearer';
+import router from './router';
 import './database';
 
 const app = express();
@@ -45,13 +39,7 @@ app.get(
   passport.authenticate('google', { scope: ['profile'] }),
 );
 
-app.use('/login', loginRoute);
-app.use('/product', productRoute);
-app.use('/fair', fairRoute);
-app.use('/type', typeRoute);
-app.use('/user', userRoute);
-app.use('/client', clientRoute);
-app.use('/troller', trollerRoute);
+app.use('/api', router);
 
 app.listen(3001, () => {
   console.log('Server started on port 3001');

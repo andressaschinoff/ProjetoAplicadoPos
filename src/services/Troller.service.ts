@@ -6,14 +6,14 @@ import Troller from '../models/Troller';
 
 interface Request {
   products?: Products[];
-  client: Client;
+  client?: Client;
   active?: boolean;
 }
 
 class CreateTrollerService {
   public async execute({
-    products,
     client,
+    products,
     active,
   }: Request): Promise<Troller> {
     const trollerRepository = getRepository(Troller);
