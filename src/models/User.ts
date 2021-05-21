@@ -8,9 +8,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 
 import Fair from './Fair';
+import Troller from './Troller';
 
 @Entity('users')
 export default class User {
@@ -32,6 +34,15 @@ export default class User {
   @Column()
   telephone: string;
 
+  @Column()
+  role: string;
+
+  @Column({ nullable: true })
+  zipcode: string;
+
+  @Column({ nullable: true })
+  address: string;
+
   @CreateDateColumn({
     name: 'date_create',
   })
@@ -45,6 +56,9 @@ export default class User {
   @ManyToOne(() => Fair, fair => fair.users, { nullable: true })
   @JoinColumn({ name: 'fair_id' })
   fair: Fair;
+
+  @OneToMany(() => Troller, troller => troller.client, { nullable: true })
+  trollers: Troller[];
 
   @BeforeInsert()
   createDates() {

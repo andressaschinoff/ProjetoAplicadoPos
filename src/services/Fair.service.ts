@@ -6,7 +6,7 @@ import FairRepository from '../repositories/Fair.repository';
 
 interface Request {
   name: string;
-  zipcode: number;
+  zipcode: string;
   address: string;
   score: number;
   opening: string;

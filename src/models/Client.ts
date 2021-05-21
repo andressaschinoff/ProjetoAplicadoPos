@@ -30,6 +30,9 @@ export default class User {
   @Column()
   telephone: string;
 
+  @Column()
+  role: string;
+
   @OneToMany(() => Troller, troller => troller.client)
   trollers: Troller[];
 

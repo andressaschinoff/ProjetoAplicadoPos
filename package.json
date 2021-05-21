@@ -21,7 +21,7 @@
     "fs": "0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "jsrsasign": "^10.1.13",
-    "jsrsasign-util": "^1.0.4",
+    "jsrsasign-util": "^1.0.5",
     "passport": "^0.4.1",
     "passport-google-oauth20": "^2.0.0",
     "passport-http-bearer": "^1.0.1",

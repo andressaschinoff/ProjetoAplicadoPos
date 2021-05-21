@@ -21,7 +21,7 @@ export default class Fair {
   name: string;
 
   @Column()
-  zipcode: number;
+  zipcode: string;
 
   @Column()
   address: string;
