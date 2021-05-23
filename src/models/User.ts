@@ -14,7 +14,7 @@ import {
 import Fair from './Fair';
 import Troller from './Troller';
 
-@Entity('users')
+@Entity('user')
 export default class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -34,7 +34,7 @@ export default class User {
   @Column()
   telephone: string;
 
-  @Column()
+  @Column({ default: 'buyer' })
   role: string;
 
   @Column({ nullable: true })
@@ -57,7 +57,7 @@ export default class User {
   @JoinColumn({ name: 'fair_id' })
   fair: Fair;
 
-  @OneToMany(() => Troller, troller => troller.client, { nullable: true })
+  @OneToMany(() => Troller, troller => troller.user, { nullable: true })
   trollers: Troller[];
 
   @BeforeInsert()

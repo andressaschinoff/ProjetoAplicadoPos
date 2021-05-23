@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "dev:server": "ts-node-dev --inspect --ignore node_modules src/server.ts",
+    "dev:server": "ts-node-dev --resolveJsonModule --inspect --ignore node_modules src/server.ts",
     "start": "ts-node src/server.ts",
     "typeorm": "ts-node-dev ./node_modules/typeorm/cli.js"
   },
@@ -27,6 +27,8 @@
     "passport-http-bearer": "^1.0.1",
     "pg": "^8.5.1",
     "reflect-metadata": "^0.1.13",
+    "swagger-autogen": "^2.8.2",
+    "swagger-ui-express": "^4.1.6",
     "typeorm": "^0.2.29",
     "uuidv4": "^6.2.5"
   },
@@ -39,6 +41,7 @@
     "@types/passport": "^1.0.6",
     "@types/passport-google-oauth20": "^2.0.6",
     "@types/passport-http-bearer": "^1.0.36",
+    "@types/swagger-ui-express": "^4.1.2",
     "@typescript-eslint/eslint-plugin": "^4.8.1",
     "@typescript-eslint/parser": "^4.8.1",
     "eslint": "^7.14.0",

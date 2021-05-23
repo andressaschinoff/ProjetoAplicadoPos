@@ -1,8 +1,9 @@
 import { Router, Request, Response, NextFunction, request } from 'express';
 import { getRepository } from 'typeorm';
-import Client from '../models/Client';
+// import Client from '../models/Client';
 import Products from '../models/Products';
 import Troller from '../models/Troller';
+import User from '../models/User';
 import CreateProductsService from '../services/Products.service';
 
 import CreateTrollerService from '../services/Troller.service';
@@ -52,17 +53,19 @@ routes.put('/:id', async (request, response) => {
     const { id } = request.params;
     const {
       products,
-      client,
+      user,
       active,
     }: {
       products?: Products[];
-      client?: Client;
+      user?: User;
+      // client?: Client;
       active?: boolean;
     } = request.body;
 
     const productsService = new CreateProductsService();
     const newProducts: Products[] = [];
-    const newTroller = { products, active, client };
+    const newTroller = { products, active, user };
+    // const newTroller = { products, active, client };
 
     if (products !== undefined) {
       for (let i = 0; i < products.length; i++) {

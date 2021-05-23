@@ -31,7 +31,7 @@ routes.get('/', async (_request, response) => {
 
 routes.post('/', async (request, response) => {
   try {
-    const { name, cpf, email, password, telephone, fair } = request.body;
+    const { name, cpf, email, password, telephone, fair, role } = request.body;
 
     const userService = new CreateUserService();
     const newUser = await userService.execute({
@@ -41,6 +41,7 @@ routes.post('/', async (request, response) => {
       password,
       telephone,
       fair,
+      role,
     });
     return response.json(newUser);
   } catch (err) {

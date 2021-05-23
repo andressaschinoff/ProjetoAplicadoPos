@@ -11,6 +11,7 @@ interface RequestPost {
   password: string;
   telephone: string;
   fair?: Fair;
+  role: string;
 }
 
 class CreateUserService {
@@ -21,6 +22,7 @@ class CreateUserService {
     password,
     telephone,
     fair,
+    role,
   }: RequestPost): Promise<User> {
     const userRepository = getRepository(User);
 
@@ -41,6 +43,7 @@ class CreateUserService {
       password: encriptedPass,
       telephone,
       fair,
+      role,
     });
 
     await userRepository.save(user);
