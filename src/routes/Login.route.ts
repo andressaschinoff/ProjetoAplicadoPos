@@ -47,7 +47,8 @@ async function findClientOrUser(email: string, password: string) {
       const privateKey = fs.readFileSync(keys.private, 'utf-8');
 
       if (pwdMatches) {
-        var token = sign({ ...finded }, privateKey, {
+        const { password, ...user } = finded;
+        var token = sign({ ...user }, privateKey, {
           expiresIn: 300,
           algorithm: 'RS256',
         });

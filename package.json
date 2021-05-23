@@ -8,6 +8,7 @@
     "build": "tsc",
     "dev:server": "ts-node-dev --resolveJsonModule --inspect --ignore node_modules src/server.ts",
     "start": "ts-node src/server.ts",
+    "swagger-autogen": "ts-node swagger.ts",
     "typeorm": "ts-node-dev ./node_modules/typeorm/cli.js"
   },
   "dependencies": {
@@ -15,8 +16,6 @@
     "@types/cors": "^2.8.10",
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
-    "date-fns": "^2.16.1",
-    "dateformat": "^4.3.1",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
     "jsonwebtoken": "^8.5.1",

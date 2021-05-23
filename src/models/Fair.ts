@@ -26,11 +26,14 @@ export default class Fair {
   @Column()
   address: string;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', default: 0 })
   score: number;
 
+  @Column({ type: 'int', default: 0 })
+  numberOfScores: number;
+
   @Column({ name: 'week_day' })
-  weekDay: string;
+  weekdays: string;
 
   @Column()
   opening: string;
@@ -41,7 +44,7 @@ export default class Fair {
   @Column({ name: 'delivery_price' })
   deliveryPrice: number;
 
-  @Column({ name: 'money_sign', type: 'float' })
+  @Column({ name: 'money_sign', type: 'float', default: 0 })
   moneySign: number;
 
   @Column({ type: 'enum', array: true, enum: Type })
