@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import express from 'express';
 import passport from 'passport';
 import swaggerUi from 'swagger-ui-express';
-import swaggerFile from './swagger.json';
+import swaggerFile from '../swagger.json';
 import { googleConfig } from './configs/passportconfig';
 import GooglePassport from 'passport-google-oauth20';
 import BearerPassport from 'passport-http-bearer';
