@@ -93,15 +93,6 @@ routes.put('/:id', async (request, response) => {
       });
     });
 
-    // await userRepository.update(id, {
-    //   name,
-    //   cpf,
-    //   email,
-    //   password,
-    //   telephone,
-    //   fair,
-    // });
-
     const updateUser = await userRepository.findByIds([id]);
 
     return response.json(updateUser);
