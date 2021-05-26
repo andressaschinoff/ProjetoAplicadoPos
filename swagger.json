@@ -503,6 +503,12 @@
                 },
                 "role": {
                   "example": "any"
+                },
+                "address": {
+                  "example": "any"
+                },
+                "zipcode": {
+                  "example": "any"
                 }
               }
             }
@@ -612,6 +618,14 @@
         }
       }
     },
+    "/api/troller/empty": {
+      "get": {
+        "tags": [],
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
     "/api/troller/{id}": {
       "get": {
         "tags": [],
@@ -665,6 +679,47 @@
           }
         }
       },
+      "delete": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/api/troller/user/{id}": {
+      "get": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/api/troller/exclude/{id}": {
       "delete": {
         "tags": [],
         "description": "",

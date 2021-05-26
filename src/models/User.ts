@@ -10,6 +10,7 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
+import { userRoute } from '../routes/User.route';
 
 import Fair from './Fair';
 import Troller from './Troller';
@@ -53,7 +54,10 @@ export default class User {
   })
   updateAt: Date;
 
-  @ManyToOne(() => Fair, fair => fair.users, { nullable: true })
+  @ManyToOne(() => Fair, fair => fair.users, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'fair_id' })
   fair: Fair;
 
