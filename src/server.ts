@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import express from 'express';
+import cors from 'cors';
 import passport from 'passport';
 import swaggerUi from 'swagger-ui-express';
 import swaggerFile from '../swagger.json';
@@ -11,6 +12,7 @@ import './database';
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 const GoogleStrategy = GooglePassport.Strategy;
