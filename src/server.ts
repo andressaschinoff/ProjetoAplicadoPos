@@ -1,6 +1,8 @@
 import 'reflect-metadata';
 import express from 'express';
 import passport from 'passport';
+import swaggerUi from 'swagger-ui-express';
+import swaggerFile from '../swagger.json';
 import { googleConfig } from './configs/passportconfig';
 import GooglePassport from 'passport-google-oauth20';
 import BearerPassport from 'passport-http-bearer';
@@ -40,6 +42,7 @@ app.get(
 );
 
 app.use('/api', router);
+app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 app.listen(3001, () => {
   console.log('Server started on port 3001');

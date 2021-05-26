@@ -6,14 +6,12 @@ import FairRepository from '../repositories/Fair.repository';
 
 interface Request {
   name: string;
-  zipcode: number;
+  zipcode: string;
   address: string;
-  score: number;
   opening: string;
   closing: string;
-  weekDay: string;
+  weekdays: string[];
   deliveryPrice: number;
-  moneySign: number;
   types: Type[];
 }
 
@@ -22,26 +20,24 @@ class CreateFairService {
     name,
     zipcode,
     address,
-    score,
     opening,
     closing,
-    weekDay,
+    weekdays,
     deliveryPrice,
-    moneySign,
     types,
   }: Request): Promise<Fair> {
     const fairRepository = getCustomRepository(FairRepository);
+
+    const newWeekdays = weekdays.join('|');
 
     const fair = fairRepository.create({
       name,
       zipcode,
       address,
-      score,
       opening,
       closing,
-      weekDay,
+      weekdays: newWeekdays,
       deliveryPrice,
-      moneySign,
       types,
     });
 
@@ -50,4 +46,26 @@ class CreateFairService {
   }
 }
 
-export default CreateFairService;
+class ScoreFairService {
+  public async execute(
+    id: string,
+    {
+      score,
+    }: {
+      score: number;
+    },
+  ): Promise<Fair> {
+    const fairRepository = getCustomRepository(FairRepository);
+
+    const currentFair = (await fairRepository.findByIds([id]))[0];
+
+    const newScore = (currentFair.score + score) / currentFair.numberOfScores;
+    await fairRepository.update(id, { ...currentFair, score: newScore });
+
+    const fair = (await fairRepository.findByIds([id]))[0];
+
+    return fair;
+  }
+}
+
+export { CreateFairService, ScoreFairService };

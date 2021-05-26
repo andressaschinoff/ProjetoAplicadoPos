@@ -11,6 +11,9 @@ interface RequestPost {
   password: string;
   telephone: string;
   fair?: Fair;
+  address?: string;
+  zipcode?: string;
+  role: string;
 }
 
 class CreateUserService {
@@ -21,8 +24,15 @@ class CreateUserService {
     password,
     telephone,
     fair,
+    role,
+    address,
+    zipcode,
   }: RequestPost): Promise<User> {
     const userRepository = getRepository(User);
+
+    if (role === 'buyer' && (!address || !zipcode)) {
+      throw new Error(`User role ${role} needs to send address info`);
+    }
 
     const hashPassword = new Promise<string>((resolve, _reject) => {
       genSalt(10, (_err, salt) => {
@@ -41,6 +51,9 @@ class CreateUserService {
       password: encriptedPass,
       telephone,
       fair,
+      role,
+      address,
+      zipcode,
     });
 
     await userRepository.save(user);

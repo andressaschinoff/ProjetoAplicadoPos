@@ -1,7 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { getCustomRepository } from 'typeorm';
-import dateFormat from 'dateformat';
-import { parseISO } from 'date-fns';
 
 import ProductRepository from '../repositories/Product.repository';
 import CreateProductService from '../services/Product.service';

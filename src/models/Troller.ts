@@ -9,8 +9,8 @@ import {
   ManyToMany,
   ManyToOne,
 } from 'typeorm';
-import Client from './Client';
 import Products from './Products';
+import User from './User';
 
 @Entity('troller')
 export default class Troller {
@@ -26,8 +26,8 @@ export default class Troller {
   @ManyToMany(() => Products, products => products.trollers, { nullable: true })
   products: Products[];
 
-  @ManyToOne(() => Client, client => client.trollers, { nullable: true })
-  client: Client;
+  @ManyToOne(() => User, user => user.trollers, { nullable: true })
+  user: User;
 
   @CreateDateColumn({
     name: 'create_at',

@@ -1,11 +1,20 @@
-import { Router, Request, Response, NextFunction, request } from 'express';
+import {
+  Router,
+  Request,
+  Response,
+  NextFunction,
+  request,
+  response,
+} from 'express';
 import { getRepository } from 'typeorm';
-import Client from '../models/Client';
+// import Client from '../models/Client';
 import Products from '../models/Products';
 import Troller from '../models/Troller';
+import User from '../models/User';
 import CreateProductsService from '../services/Products.service';
 
 import CreateTrollerService from '../services/Troller.service';
+import getTrollerActive from './User.route';
 
 const routes = Router();
 
@@ -21,9 +30,9 @@ routes.post('/', async (request, response) => {
   try {
     const req = request.body;
 
-    const newTroller = new CreateTrollerService();
+    const trollerService = new CreateTrollerService();
 
-    const troller = await newTroller.execute({ ...req });
+    const troller = await trollerService.execute({ ...req });
 
     return response.json(troller);
   } catch (err) {
@@ -33,14 +42,59 @@ routes.post('/', async (request, response) => {
   }
 });
 
+routes.get('/empty', async (_request, response) => {
+  try {
+    const trollerRepository = getRepository(Troller);
+
+    const emptyTroller = await trollerRepository.findOne({
+      where: { user: { id: null } },
+    });
+
+    if (!emptyTroller) {
+      const trollerService = new CreateTrollerService();
+
+      const troller = await trollerService.execute({});
+      return response.json(troller);
+    }
+
+    return response.json(emptyTroller);
+  } catch (error) {}
+});
+
 routes.get('/:id', async (request, response) => {
   try {
     const { id } = request.params;
 
     const trollerRepository = getRepository(Troller);
-    const troller = await trollerRepository.findByIds([id]);
+    const troller = await trollerRepository.find({
+      where: { user: { id }, active: true },
+    });
 
     return response.json(troller);
+  } catch (err) {
+    console.error(err);
+    return response.status(400).json({ error: err.message });
+  }
+});
+
+routes.get('/user/:id', async (request, response) => {
+  try {
+    const { id } = request.params;
+    const trollerActive = await getTrollerActive(id);
+
+    if (!!trollerActive?.error) {
+      response.status(400).json({ error: trollerActive.error });
+    }
+
+    if (trollerActive?.troller?.length === 0) {
+      const trollerService = new CreateTrollerService();
+      const troller = await trollerService.execute({
+        user: trollerActive?.user,
+      });
+
+      return response.json(troller);
+    }
+    return response.json(trollerActive.troller);
   } catch (err) {
     console.error(err);
     return response.status(400).json({ error: err.message });
@@ -52,17 +106,18 @@ routes.put('/:id', async (request, response) => {
     const { id } = request.params;
     const {
       products,
-      client,
+      user,
       active,
     }: {
       products?: Products[];
-      client?: Client;
+      user?: User;
       active?: boolean;
     } = request.body;
 
     const productsService = new CreateProductsService();
     const newProducts: Products[] = [];
-    const newTroller = { products, active, client };
+    const newTroller = { products, active, user };
+    // const newTroller = { products, active, client };
 
     if (products !== undefined) {
       for (let i = 0; i < products.length; i++) {
@@ -94,6 +149,20 @@ routes.put('/:id', async (request, response) => {
 });
 
 routes.delete('/:id', async (request, response) => {
+  try {
+    const { id } = request.params;
+
+    const trollerRepository = getRepository(Troller);
+    await trollerRepository.update(id, { active: false });
+
+    return response.status(204).json();
+  } catch (err) {
+    console.error(err);
+    return response.status(400).json({ error: err.message });
+  }
+});
+
+routes.delete('/exclude/:id', async (request, response) => {
   try {
     const { id } = request.params;
 

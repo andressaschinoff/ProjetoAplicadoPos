@@ -31,7 +31,17 @@ routes.get('/', async (_request, response) => {
 
 routes.post('/', async (request, response) => {
   try {
-    const { name, cpf, email, password, telephone, fair } = request.body;
+    const {
+      name,
+      cpf,
+      email,
+      password,
+      telephone,
+      fair,
+      role,
+      address,
+      zipcode,
+    } = request.body;
 
     const userService = new CreateUserService();
     const newUser = await userService.execute({
@@ -41,6 +51,9 @@ routes.post('/', async (request, response) => {
       password,
       telephone,
       fair,
+      role,
+      address,
+      zipcode,
     });
     return response.json(newUser);
   } catch (err) {
@@ -92,15 +105,6 @@ routes.put('/:id', async (request, response) => {
       });
     });
 
-    // await userRepository.update(id, {
-    //   name,
-    //   cpf,
-    //   email,
-    //   password,
-    //   telephone,
-    //   fair,
-    // });
-
     const updateUser = await userRepository.findByIds([id]);
 
     return response.json(updateUser);
@@ -123,5 +127,27 @@ routes.delete('/:id', async (request, response) => {
     return response.status(400).json({ error: err.message });
   }
 });
+
+export default async function getTrollerActive(id: string) {
+  try {
+    const userRepository = getRepository(User);
+    const user = await userRepository.findOne({
+      relations: ['trollers'],
+      where: { id },
+    });
+
+    if (!user) {
+      throw new Error(`Don't have user id ${id}`);
+    }
+    console.log(user);
+
+    const troller = user?.trollers.filter(({ active }) => active === true);
+
+    return { troller, user };
+  } catch (err) {
+    console.error(err);
+    return { error: err.message };
+  }
+}
 
 export { routes as userRoute };

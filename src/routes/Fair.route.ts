@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { getCustomRepository } from 'typeorm';
 
 import FairRepository from '../repositories/Fair.repository';
-import CreateFairService from '../services/Fair.service';
+import { CreateFairService, ScoreFairService } from '../services/Fair.service';
 
 const routes = Router();
 
@@ -34,12 +34,10 @@ routes.post('/', async (request, response) => {
       name,
       zipcode,
       address,
-      score,
       opening,
       closing,
-      weekDay,
+      weekdays,
       deliveryPrice,
-      moneySign,
       types,
     } = request.body;
 
@@ -49,12 +47,10 @@ routes.post('/', async (request, response) => {
       name,
       zipcode,
       address,
-      score,
       opening,
       closing,
-      weekDay,
+      weekdays,
       deliveryPrice,
-      moneySign,
       types,
     });
 
@@ -66,7 +62,7 @@ routes.post('/', async (request, response) => {
   }
 });
 
-routes.get('/id/:id', async (request, response) => {
+routes.get('/:id', async (request, response) => {
   try {
     const { id } = request.params;
 
@@ -126,12 +122,10 @@ routes.put('/:id', async (request, response) => {
       name,
       zipcode,
       address,
-      score,
       opening,
       closing,
-      weekDay,
+      weekdays,
       deliveryPrice,
-      moneySign,
       types,
     } = request.body;
 
@@ -141,16 +135,29 @@ routes.put('/:id', async (request, response) => {
       name,
       zipcode,
       address,
-      score,
       opening,
       closing,
-      weekDay,
+      weekdays,
       deliveryPrice,
-      moneySign,
       types,
     });
 
     const updateFair = await fairRepository.findByIds([id]);
+
+    return response.json(updateFair);
+  } catch (err) {
+    console.error(err);
+    return response.status(400).json({ error: err.message });
+  }
+});
+
+routes.put('/:id/score', async (request, response) => {
+  try {
+    const { id } = request.params;
+    const { score } = request.body;
+
+    const scoreService = new ScoreFairService();
+    const updateFair = await scoreService.execute(id, { score });
 
     return response.json(updateFair);
   } catch (err) {
