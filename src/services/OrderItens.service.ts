@@ -20,7 +20,6 @@ class CreateOrderItensService {
     });
 
     if (!findedProd) {
-      console.log('here');
       throw new Error(`Error while looking for product id ${product.id}`);
     }
 
@@ -30,7 +29,6 @@ class CreateOrderItensService {
 
     if (!!orderItens && orderItens.length > 0) {
       for (const orderItem of orderItens) {
-        console.log(orderItem);
         await orderItemRepo.update(orderItem.id, {
           quantity,
           total: findedProd.price * quantity,
@@ -41,16 +39,14 @@ class CreateOrderItensService {
       return;
     }
 
-    const newProducts = orderItemRepo.create({
+    const newOrderItens = orderItemRepo.create({
       quantity,
       total: findedProd.price * quantity,
       product: findedProd,
       troller,
     });
 
-    console.log(newProducts);
-
-    await orderItemRepo.save(newProducts);
+    await orderItemRepo.save(newOrderItens);
   }
 }
 

@@ -139,7 +139,6 @@ export default async function getTrollerActive(id: string) {
     if (!user) {
       throw new Error(`Don't have user id ${id}`);
     }
-    console.log(user);
 
     const troller = user?.trollers.filter(({ active }) => active === true);
 

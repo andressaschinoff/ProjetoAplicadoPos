@@ -120,22 +120,14 @@ routes.put('/:id', async (request, response) => {
 
     if (orderItens !== undefined && orderItens.length > 0) {
       for (const orderItem of orderItens) {
-        console.log('before server');
         await orderItemService.execute({
           ...orderItem,
           troller: findedTroller,
         });
       }
-      console.log('after server');
     }
 
-    console.log('before troller update');
-
     const updateTroller = await trollerRepository.customUpdate(id, user);
-
-    console.log('after troller update');
-
-    console.log(updateTroller);
 
     return response.json(updateTroller);
   } catch (err) {
@@ -143,48 +135,6 @@ routes.put('/:id', async (request, response) => {
     return response.status(400).json({ error: err.message });
   }
 });
-
-// routes.put('/:id', async (request, response) => {
-//   try {
-//     const { id } = request.params;
-//     const { orderItens } = request.body as Troller;
-
-//     const orderItemService = new CreateOrderItensService();
-//     const trollerRepository = getCustomRepository(TrollerRepository);
-
-//     const findedTroller = await trollerRepository.findOne({ where: { id } });
-
-//     if (!findedTroller) {
-//       return response
-//         .status(401)
-//         .json({ error: `Troller id ${id} not finded.` });
-//     }
-
-//     if (orderItens !== undefined && orderItens.length > 0) {
-//       for (const orderItem of orderItens) {
-//         console.log('before server');
-//         await orderItemService.execute({
-//           ...orderItem,
-//           troller: findedTroller,
-//         });
-//       }
-//       console.log('after server');
-//     }
-
-//     console.log('before troller update');
-
-//     const updateTroller = await trollerRepository.customUpdate(id);
-
-//     console.log('after troller update');
-
-//     console.log(updateTroller);
-
-//     return response.json(updateTroller);
-//   } catch (err) {
-//     console.error(err);
-//     return response.status(400).json({ error: err.message });
-//   }
-// });
 
 routes.delete('/:id', async (request, response) => {
   try {

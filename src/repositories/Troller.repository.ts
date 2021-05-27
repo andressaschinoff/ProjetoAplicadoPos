@@ -13,12 +13,14 @@ class TrollerRepository extends Repository<Troller> {
       const orderItens = await orderItemRepo.find({
         where: { troller: { id } },
       });
-      console.log(orderItens);
 
       let currentUser = user;
 
       if (!currentUser) {
-        const oldTroller = await trollerRepository.findOne({ where: { id } });
+        const oldTroller = await trollerRepository.findOne({
+          where: { id },
+          relations: ['user'],
+        });
         currentUser = oldTroller?.user;
       }
 
