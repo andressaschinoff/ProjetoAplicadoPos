@@ -6,12 +6,13 @@ import {
   request,
   response,
 } from 'express';
-import { getRepository } from 'typeorm';
+import { getCustomRepository, getRepository } from 'typeorm';
 // import Client from '../models/Client';
-import Products from '../models/Products';
+import OrderItem from '../models/OrderItem';
 import Troller from '../models/Troller';
 import User from '../models/User';
-import CreateProductsService from '../services/Products.service';
+import TrollerRepository from '../repositories/Troller.repository';
+import CreateOrderItensService from '../services/OrderItens.service';
 
 import CreateTrollerService from '../services/Troller.service';
 import getTrollerActive from './User.route';
@@ -104,42 +105,37 @@ routes.get('/user/:id', async (request, response) => {
 routes.put('/:id', async (request, response) => {
   try {
     const { id } = request.params;
-    const {
-      products,
-      user,
-      active,
-    }: {
-      products?: Products[];
-      user?: User;
-      active?: boolean;
-    } = request.body;
+    const { orderItens, user } = request.body as Troller;
 
-    const productsService = new CreateProductsService();
-    const newProducts: Products[] = [];
-    const newTroller = { products, active, user };
-    // const newTroller = { products, active, client };
+    const orderItemService = new CreateOrderItensService();
+    const trollerRepository = getCustomRepository(TrollerRepository);
 
-    if (products !== undefined) {
-      for (let i = 0; i < products.length; i++) {
-        const currentProduct = products[i];
-        const newProduct = await productsService.execute({
-          product: currentProduct.product,
-          quantity: currentProduct.quantity,
-        });
-        console.log(newProduct);
-        newProducts.push(newProduct);
-      }
-      newTroller.products = newProducts;
-      console.log(newProducts);
+    const findedTroller = await trollerRepository.findOne({ where: { id } });
+
+    if (!findedTroller) {
+      return response
+        .status(401)
+        .json({ error: `Troller id ${id} not finded.` });
     }
 
-    const trollerRepository = getRepository(Troller);
+    if (orderItens !== undefined && orderItens.length > 0) {
+      for (const orderItem of orderItens) {
+        console.log('before server');
+        await orderItemService.execute({
+          ...orderItem,
+          troller: findedTroller,
+        });
+      }
+      console.log('after server');
+    }
 
-    await trollerRepository.update(id, {
-      ...newTroller,
-    });
+    console.log('before troller update');
 
-    const updateTroller = await trollerRepository.findByIds([id]);
+    const updateTroller = await trollerRepository.customUpdate(id, user);
+
+    console.log('after troller update');
+
+    console.log(updateTroller);
 
     return response.json(updateTroller);
   } catch (err) {
@@ -147,6 +143,48 @@ routes.put('/:id', async (request, response) => {
     return response.status(400).json({ error: err.message });
   }
 });
+
+// routes.put('/:id', async (request, response) => {
+//   try {
+//     const { id } = request.params;
+//     const { orderItens } = request.body as Troller;
+
+//     const orderItemService = new CreateOrderItensService();
+//     const trollerRepository = getCustomRepository(TrollerRepository);
+
+//     const findedTroller = await trollerRepository.findOne({ where: { id } });
+
+//     if (!findedTroller) {
+//       return response
+//         .status(401)
+//         .json({ error: `Troller id ${id} not finded.` });
+//     }
+
+//     if (orderItens !== undefined && orderItens.length > 0) {
+//       for (const orderItem of orderItens) {
+//         console.log('before server');
+//         await orderItemService.execute({
+//           ...orderItem,
+//           troller: findedTroller,
+//         });
+//       }
+//       console.log('after server');
+//     }
+
+//     console.log('before troller update');
+
+//     const updateTroller = await trollerRepository.customUpdate(id);
+
+//     console.log('after troller update');
+
+//     console.log(updateTroller);
+
+//     return response.json(updateTroller);
+//   } catch (err) {
+//     console.error(err);
+//     return response.status(400).json({ error: err.message });
+//   }
+// });
 
 routes.delete('/:id', async (request, response) => {
   try {

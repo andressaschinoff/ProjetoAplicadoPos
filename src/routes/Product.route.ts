@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { getCustomRepository } from 'typeorm';
+import Product from '../models/Product';
 
 import ProductRepository from '../repositories/Product.repository';
 import CreateProductService from '../services/Product.service';
@@ -46,19 +47,18 @@ routes.get('/:fair', async (request, response) => {
 
 routes.post('/', async (request, response) => {
   try {
-    const { name, type, price, description, fair } = request.body;
+    const productsReq = request.body as Product[];
 
-    const newProduct = new CreateProductService();
+    const productService = new CreateProductService();
 
-    const product = await newProduct.execute({
-      name,
-      type,
-      price,
-      description,
-      fair,
-    });
+    const products = [];
 
-    return response.json(product);
+    for (const prod of productsReq) {
+      const product = await productService.execute({ ...prod });
+      products.push(product);
+    }
+
+    return response.json(products);
   } catch (err) {
     // log erro
     console.error(err);
@@ -110,7 +110,6 @@ routes.put('/:id', async (request, response) => {
     const { id } = request.params;
     const { name, type, description, price, fair } = request.body;
 
-    const date = new Date();
     // const parsedDate = parseISO(dateFormat(date, 'isoDateTime'));
 
     const productRepository = getCustomRepository(ProductRepository);

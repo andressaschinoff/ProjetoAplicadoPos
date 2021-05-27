@@ -5,15 +5,14 @@ import {
   CreateDateColumn,
   BeforeInsert,
   BeforeUpdate,
-  OneToOne,
   PrimaryGeneratedColumn,
-  ManyToMany,
+  ManyToOne,
 } from 'typeorm';
 import Product from './Product';
 import Troller from './Troller';
 
-@Entity('products')
-export default class Products {
+@Entity('order_item')
+export default class OrderItem {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -23,11 +22,11 @@ export default class Products {
   @Column({ type: 'float' })
   total: number;
 
-  @OneToOne(() => Product, product => product.products)
+  @ManyToOne(() => Product, product => product.orderItens)
   product: Product;
 
-  @ManyToMany(() => Troller, troller => troller.products)
-  trollers: Troller[];
+  @ManyToOne(() => Troller, troller => troller.orderItens)
+  troller: Troller;
 
   @CreateDateColumn({
     name: 'create_at',

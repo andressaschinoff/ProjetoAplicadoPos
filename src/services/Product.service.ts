@@ -11,6 +11,7 @@ interface Request {
   description: string;
   type: Type;
   fair: Fair;
+  unitsOfMeasure: string;
 }
 
 class CreateProductService {
@@ -20,6 +21,7 @@ class CreateProductService {
     description,
     type,
     fair,
+    unitsOfMeasure,
   }: Request): Promise<Product> {
     const productsRepository = getCustomRepository(ProductRepository);
 
@@ -29,6 +31,7 @@ class CreateProductService {
       description,
       type,
       fair,
+      unitsOfMeasure,
     });
     await productsRepository.save(product);
     return product;

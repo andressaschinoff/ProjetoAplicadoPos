@@ -6,10 +6,11 @@ import {
   BeforeInsert,
   BeforeUpdate,
   PrimaryGeneratedColumn,
-  ManyToMany,
   ManyToOne,
+  OneToMany,
+  JoinTable,
 } from 'typeorm';
-import Products from './Products';
+import OrderItem from './OrderItem';
 import User from './User';
 
 @Entity('troller')
@@ -23,8 +24,11 @@ export default class Troller {
   @Column({ type: 'boolean', default: true })
   active: boolean;
 
-  @ManyToMany(() => Products, products => products.trollers, { nullable: true })
-  products: Products[];
+  @OneToMany(() => OrderItem, orderItens => orderItens.troller, {
+    nullable: true,
+  })
+  @JoinTable()
+  orderItens: OrderItem[];
 
   @ManyToOne(() => User, user => user.trollers, { nullable: true })
   user: User;
