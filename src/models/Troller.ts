@@ -27,7 +27,6 @@ export default class Troller {
   @OneToMany(() => OrderItem, orderItens => orderItens.troller, {
     nullable: true,
   })
-  @JoinTable()
   orderItens: OrderItem[];
 
   @ManyToOne(() => User, user => user.trollers, { nullable: true })

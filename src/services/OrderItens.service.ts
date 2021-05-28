@@ -5,13 +5,19 @@ import Troller from '../models/Troller';
 import ProductRepository from '../repositories/Product.repository';
 
 interface Request {
+  id?: string;
   quantity: number;
   product: Product;
   troller: Troller;
 }
 
 class CreateOrderItensService {
-  public async execute({ quantity, product, troller }: Request): Promise<void> {
+  public async execute({
+    id,
+    quantity,
+    product,
+    troller,
+  }: Request): Promise<void> {
     const orderItemRepo = getRepository(OrderItem);
     const productRepository = getCustomRepository(ProductRepository);
 
@@ -23,20 +29,17 @@ class CreateOrderItensService {
       throw new Error(`Error while looking for product id ${product.id}`);
     }
 
-    const orderItens = await orderItemRepo.find({
-      where: { troller: { id: troller.id }, product: { id: product.id } },
-    });
-
-    if (!!orderItens && orderItens.length > 0) {
-      for (const orderItem of orderItens) {
+    if (!!id) {
+      const orderItem = await orderItemRepo.findOne({
+        where: { id },
+      });
+      if (!!orderItem) {
         await orderItemRepo.update(orderItem.id, {
           quantity,
           total: findedProd.price * quantity,
-          product: findedProd,
-          troller,
         });
+        return;
       }
-      return;
     }
 
     const newOrderItens = orderItemRepo.create({

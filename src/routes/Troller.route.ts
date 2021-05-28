@@ -6,16 +6,24 @@ import {
   request,
   response,
 } from 'express';
-import { getCustomRepository, getRepository } from 'typeorm';
+import {
+  createQueryBuilder,
+  getConnection,
+  getCustomRepository,
+  getManager,
+  getRepository,
+  IsNull,
+} from 'typeorm';
 // import Client from '../models/Client';
 import OrderItem from '../models/OrderItem';
+import Product from '../models/Product';
 import Troller from '../models/Troller';
 import User from '../models/User';
 import TrollerRepository from '../repositories/Troller.repository';
 import CreateOrderItensService from '../services/OrderItens.service';
 
 import CreateTrollerService from '../services/Troller.service';
-import getTrollerActive from './User.route';
+// import { getAllTrollers, getTrollerActive } from './User.route';
 
 const routes = Router();
 
@@ -47,15 +55,32 @@ routes.get('/empty', async (_request, response) => {
   try {
     const trollerRepository = getRepository(Troller);
 
-    const emptyTroller = await trollerRepository.findOne({
-      where: { user: { id: null } },
-    });
+    const emptyTroller = await trollerRepository
+      .createQueryBuilder('troller')
+      .leftJoinAndSelect('troller.user', 'user')
+      .leftJoinAndSelect('troller.orderItens', 'orderItem')
+      .leftJoinAndSelect('orderItem.product', 'product')
+      .where('troller.active = :active', { active: true })
+      .andWhere('troller.userId is null')
+      .getOne();
+    // const emptyTroller = await trollerRepository.findOne({
+    //   where: { user: { id: null } },
+    // });
 
     if (!emptyTroller) {
       const trollerService = new CreateTrollerService();
 
       const troller = await trollerService.execute({});
-      return response.json(troller);
+
+      const emptyTroller = await trollerRepository
+        .createQueryBuilder('troller')
+        .leftJoinAndSelect('troller.user', 'user')
+        .leftJoinAndSelect('troller.orderItens', 'orderItem')
+        .leftJoinAndSelect('orderItem.product', 'product')
+        .where('troller.id = :id', { id: troller.id })
+        .getOne();
+
+      return response.json(emptyTroller);
     }
 
     return response.json(emptyTroller);
@@ -67,35 +92,17 @@ routes.get('/:id', async (request, response) => {
     const { id } = request.params;
 
     const trollerRepository = getRepository(Troller);
-    const troller = await trollerRepository.find({
-      where: { user: { id }, active: true },
-    });
+
+    const troller = await trollerRepository
+      .createQueryBuilder('troller')
+      .leftJoinAndSelect('troller.user', 'user')
+      .leftJoinAndSelect('troller.orderItens', 'orderItem')
+      .leftJoinAndSelect('orderItem.product', 'product')
+      .where('troller.active = :active', { active: true })
+      .andWhere('troller.userId = :id', { id: id })
+      .getOne();
 
     return response.json(troller);
-  } catch (err) {
-    console.error(err);
-    return response.status(400).json({ error: err.message });
-  }
-});
-
-routes.get('/user/:id', async (request, response) => {
-  try {
-    const { id } = request.params;
-    const trollerActive = await getTrollerActive(id);
-
-    if (!!trollerActive?.error) {
-      response.status(400).json({ error: trollerActive.error });
-    }
-
-    if (trollerActive?.troller?.length === 0) {
-      const trollerService = new CreateTrollerService();
-      const troller = await trollerService.execute({
-        user: trollerActive?.user,
-      });
-
-      return response.json(troller);
-    }
-    return response.json(trollerActive.troller);
   } catch (err) {
     console.error(err);
     return response.status(400).json({ error: err.message });

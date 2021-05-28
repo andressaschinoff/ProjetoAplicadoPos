@@ -29,10 +29,13 @@ class TrollerRepository extends Repository<Troller> {
         total: orderItens?.reduce((acc, curr) => acc + curr.total, 0),
       });
 
-      const troller = await trollerRepository.findOne({
-        where: { id },
-        relations: ['orderItens', 'user'],
-      });
+      const troller = await trollerRepository
+        .createQueryBuilder('troller')
+        .leftJoinAndSelect('troller.user', 'user')
+        .leftJoinAndSelect('troller.orderItens', 'orderItem')
+        .leftJoinAndSelect('orderItem.product', 'product')
+        .where('troller.id = :id', { id: id })
+        .getOne();
 
       if (!troller) {
         throw new Error(`Error while is updating troller id ${id}`);
