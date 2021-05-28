@@ -8,8 +8,10 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   OneToMany,
-  JoinTable,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
+import Fair from './Fair';
 import OrderItem from './OrderItem';
 import User from './User';
 
@@ -17,6 +19,9 @@ import User from './User';
 export default class Troller {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column({ type: 'float', default: 0 })
+  subtotal: number;
 
   @Column({ type: 'float', default: 0 })
   total: number;
@@ -28,6 +33,9 @@ export default class Troller {
     nullable: true,
   })
   orderItens: OrderItem[];
+
+  @ManyToOne(() => Fair, fair => fair.trollers, { nullable: true })
+  fair: Fair;
 
   @ManyToOne(() => User, user => user.trollers, { nullable: true })
   user: User;

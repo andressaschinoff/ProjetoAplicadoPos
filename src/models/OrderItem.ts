@@ -19,7 +19,7 @@ export default class OrderItem {
   @Column()
   quantity: number;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', default: 0 })
   total: number;
 
   @ManyToOne(() => Product, product => product.orderItens)

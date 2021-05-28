@@ -29,6 +29,8 @@ class CreateOrderItensService {
       throw new Error(`Error while looking for product id ${product.id}`);
     }
 
+    const total = findedProd.price * quantity;
+
     if (!!id) {
       const orderItem = await orderItemRepo.findOne({
         where: { id },
@@ -36,7 +38,7 @@ class CreateOrderItensService {
       if (!!orderItem) {
         await orderItemRepo.update(orderItem.id, {
           quantity,
-          total: findedProd.price * quantity,
+          total,
         });
         return;
       }
@@ -44,7 +46,7 @@ class CreateOrderItensService {
 
     const newOrderItens = orderItemRepo.create({
       quantity,
-      total: findedProd.price * quantity,
+      total,
       product: findedProd,
       troller,
     });

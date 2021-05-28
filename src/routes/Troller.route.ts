@@ -58,6 +58,7 @@ routes.get('/empty', async (_request, response) => {
     const emptyTroller = await trollerRepository
       .createQueryBuilder('troller')
       .leftJoinAndSelect('troller.user', 'user')
+      .leftJoinAndSelect('troller.fair', 'fair')
       .leftJoinAndSelect('troller.orderItens', 'orderItem')
       .leftJoinAndSelect('orderItem.product', 'product')
       .where('troller.active = :active', { active: true })
@@ -75,6 +76,7 @@ routes.get('/empty', async (_request, response) => {
       const emptyTroller = await trollerRepository
         .createQueryBuilder('troller')
         .leftJoinAndSelect('troller.user', 'user')
+        .leftJoinAndSelect('troller.fair', 'fair')
         .leftJoinAndSelect('troller.orderItens', 'orderItem')
         .leftJoinAndSelect('orderItem.product', 'product')
         .where('troller.id = :id', { id: troller.id })
@@ -96,6 +98,7 @@ routes.get('/:id', async (request, response) => {
     const troller = await trollerRepository
       .createQueryBuilder('troller')
       .leftJoinAndSelect('troller.user', 'user')
+      .leftJoinAndSelect('troller.fair', 'fair')
       .leftJoinAndSelect('troller.orderItens', 'orderItem')
       .leftJoinAndSelect('orderItem.product', 'product')
       .where('troller.active = :active', { active: true })
@@ -112,7 +115,7 @@ routes.get('/:id', async (request, response) => {
 routes.put('/:id', async (request, response) => {
   try {
     const { id } = request.params;
-    const { orderItens, user } = request.body as Troller;
+    const { orderItens, fair, user } = request.body as Troller;
 
     const orderItemService = new CreateOrderItensService();
     const trollerRepository = getCustomRepository(TrollerRepository);
@@ -134,7 +137,7 @@ routes.put('/:id', async (request, response) => {
       }
     }
 
-    const updateTroller = await trollerRepository.customUpdate(id, user);
+    const updateTroller = await trollerRepository.customUpdate(id, user, fair);
 
     return response.json(updateTroller);
   } catch (err) {

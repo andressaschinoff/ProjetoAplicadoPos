@@ -24,10 +24,10 @@ export default class Product {
   @Column()
   name: string;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', default: 0 })
   price: number;
 
-  @Column({ name: 'count_in_stock', default: 0 })
+  @Column({ name: 'count_in_stock', nullable: true })
   countInStock: number;
 
   @Column({ name: 'units_of_measure' })
