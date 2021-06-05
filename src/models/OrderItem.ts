@@ -7,6 +7,7 @@ import {
   BeforeUpdate,
   PrimaryGeneratedColumn,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import Product from './Product';
 import Troller from './Troller';
@@ -22,10 +23,12 @@ export default class OrderItem {
   @Column({ type: 'float', default: 0 })
   total: number;
 
-  @ManyToOne(() => Product, product => product.orderItens)
+  @ManyToOne(() => Product, product => product.orderItens, { eager: true })
+  @JoinColumn([{ name: 'product_id', referencedColumnName: 'id' }])
   product: Product;
 
   @ManyToOne(() => Troller, troller => troller.orderItens)
+  @JoinColumn([{ name: 'troller_id', referencedColumnName: 'id' }])
   troller: Troller;
 
   @CreateDateColumn({

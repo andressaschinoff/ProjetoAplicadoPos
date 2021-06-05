@@ -40,7 +40,7 @@ export default class Product {
   type: Type;
 
   @ManyToOne(() => Fair, fair => fair.products, { nullable: false })
-  @JoinColumn({ name: 'fair_id' })
+  @JoinColumn([{ name: 'fair_id', referencedColumnName: 'id' }])
   fair: Fair;
 
   @OneToMany(() => OrderItem, orderItens => orderItens.product)

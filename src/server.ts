@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import express from 'express';
+import session from 'express-session';
 import cors from 'cors';
 import passport from 'passport';
 import swaggerUi from 'swagger-ui-express';
@@ -9,11 +10,29 @@ import GooglePassport from 'passport-google-oauth20';
 import BearerPassport from 'passport-http-bearer';
 import router from './router';
 import './database';
+import { privateKey } from './routes/Login.route';
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+app.set('trust proxy', 1);
+
+app.use(
+  session({
+    secret: privateKey,
+    saveUninitialized: true,
+    resave: false,
+    cookie: { secure: true, httpOnly: true, maxAge: 3600000 * 24 },
+  }),
+);
+
+declare module 'express-session' {
+  interface SessionData {
+    token: string;
+  }
+}
 
 const GoogleStrategy = GooglePassport.Strategy;
 
@@ -43,7 +62,13 @@ app.get(
   passport.authenticate('google', { scope: ['profile'] }),
 );
 
+app.use((req, res, next) => {
+  console.log(req.session);
+  next();
+});
+
 app.use('/api', router);
+
 app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 app.listen(3001, () => {

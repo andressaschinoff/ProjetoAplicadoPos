@@ -67,7 +67,7 @@ routes.get('/:id', async (request, response) => {
     const { id } = request.params;
 
     const fairRepository = getCustomRepository(FairRepository);
-    const fair = await fairRepository.findByIds([id]);
+    const fair = await fairRepository.findOne({ id });
 
     return response.json(fair);
   } catch (err) {

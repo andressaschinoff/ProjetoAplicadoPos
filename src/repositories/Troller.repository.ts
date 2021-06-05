@@ -28,7 +28,6 @@ class TrollerRepository extends Repository<Troller> {
         });
         currentUser = oldTroller?.user;
       }
-      console.log(fair);
 
       const subtotal = orderItens?.reduce((acc, curr) => acc + curr.total, 0);
       const total =
@@ -41,22 +40,23 @@ class TrollerRepository extends Repository<Troller> {
         total,
       });
 
-      const troller = await trollerRepository
-        .createQueryBuilder('troller')
-        .leftJoinAndSelect('troller.user', 'user')
-        .leftJoinAndSelect('troller.fair', 'fair')
-        .leftJoinAndSelect('troller.orderItens', 'orderItem')
-        .leftJoinAndSelect('orderItem.product', 'product')
-        .where('troller.id = :id', { id: id })
-        .getOne();
+      // const troller = await trollerRepository
+      //   .createQueryBuilder('troller')
+      //   .leftJoinAndSelect('troller.user', 'user')
+      //   .leftJoinAndSelect('troller.fair', 'fair')
+      //   .leftJoinAndSelect('troller.orderItens', 'orderItem')
+      //   .leftJoinAndSelect('orderItem.product', 'product')
+      //   .where('troller.id = :id', { id: id })
+      //   .getOne();
+      const updatedTroller = await trollerRepository.findOne({ id });
 
-      console.log(troller);
+      console.log(updatedTroller);
 
-      if (!troller) {
+      if (!updatedTroller) {
         throw new Error(`Error while is updating troller id ${id}`);
       }
 
-      return troller;
+      return updatedTroller;
     } catch (error) {
       console.error(error);
       return null;

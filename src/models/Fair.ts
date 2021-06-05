@@ -43,6 +43,9 @@ export default class Fair {
   @Column()
   closing: string;
 
+  @Column()
+  whatsapp: string;
+
   @Column({ name: 'delivery_price' })
   deliveryPrice: number;
 

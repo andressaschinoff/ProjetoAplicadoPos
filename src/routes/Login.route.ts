@@ -1,5 +1,5 @@
-import { Router, Request, Response, NextFunction, response } from 'express';
-import { decode, sign, verify } from 'jsonwebtoken';
+import { Router, Request, Response, NextFunction } from 'express';
+import { sign, verify } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { getRepository } from 'typeorm';
 import fs from 'fs';
@@ -12,7 +12,7 @@ const keys = {
   public: path.resolve('jwtRS256.key.pub'),
 };
 
-const privateKey = fs.readFileSync(keys.private, 'utf-8');
+export const privateKey = fs.readFileSync(keys.private, 'utf-8');
 
 function logRequest(request: Request, _response: Response, next: NextFunction) {
   const { method, originalUrl } = request;
@@ -27,6 +27,9 @@ routes.post('/', async (req, res) => {
 
   if (email && password) {
     const resp = await findUser(email, password);
+    if (!!resp.token) {
+      req.session.token = resp.token;
+    }
     return resp.auth
       ? res.json({ token: resp.token })
       : res.status(401).json(resp.message);
@@ -64,23 +67,22 @@ async function findUser(email: string, password: string) {
   }
 }
 
-const isAuth = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers.authorization;
+export const authJWT = (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
 
-  if (token) {
-    const onlyToken = token.slice(7, token.length);
+  if (authHeader) {
+    const token = authHeader.slice(7, authHeader.length);
 
-    verify(onlyToken, privateKey, (err, decode) => {
+    verify(token, privateKey, (err, decode) => {
       if (err) {
         return res.json({ error: err.message });
       }
       req.user = decode;
       next();
-      return;
     });
+  } else {
+    res.status(401).send({ error: 'Token is not supplied.' });
   }
-
-  return res.status(401).send({ error: 'Token is not supplied.' });
 };
 
 const isAdmin = (req: Request, res: Response, next: NextFunction) => {
@@ -92,6 +94,7 @@ const isAdmin = (req: Request, res: Response, next: NextFunction) => {
 };
 
 routes.get('/logout', function (req, res) {
+  req.session.destroy(err => console.error(err));
   req.logout();
   res.redirect('/');
 });
