@@ -33,7 +33,7 @@ routes.post('/', async (request, response) => {
   }
 });
 
-routes.post('/buy/:id', async (request, response) => {
+routes.post('/checkout/:id', async (request, response) => {
   try {
     const { id } = request.params;
     // const paymentInfo = request.body as Payment;
