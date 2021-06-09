@@ -7,13 +7,13 @@ import CreateUserService from '../services/User.service';
 
 const routes = Router();
 
-function logRequest(request: Request, _response: Response, next: NextFunction) {
-  const { method, originalUrl } = request;
-  console.info(method + ': ' + originalUrl);
-  return next();
-}
+// function logRequest(request: Request, _response: Response, next: NextFunction) {
+//   const { method, originalUrl } = request;
+//   console.info(method + ': ' + originalUrl);
+//   return next();
+// }
 
-routes.use(logRequest);
+// routes.use(logRequest);
 
 routes.get('/', async (_request, response) => {
   try {

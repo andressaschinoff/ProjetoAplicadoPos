@@ -13,6 +13,7 @@ import {
 } from 'typeorm';
 
 import Fair from './Fair';
+import OrderToSeller from './OrderToSeller';
 import Troller from './Troller';
 
 // @Check(`'role' = 'buyer' AND 'zipcode' <> null AND address <> null`)
@@ -55,18 +56,21 @@ export default class User {
   })
   updateAt: Date;
 
+  @OneToMany(() => Troller, troller => troller.user, { nullable: true })
+  trollers: Troller[];
+
+  @OneToMany(() => OrderToSeller, orderSeller => orderSeller.user, {
+    nullable: true,
+    eager: true,
+  })
+  orderSellers: OrderToSeller[];
+
   @ManyToOne(() => Fair, fair => fair.users, {
     nullable: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn([{ name: 'fair_id', referencedColumnName: 'id' }])
   fair: Fair;
-
-  @OneToMany(() => Troller, troller => troller.user, { nullable: true })
-  trollers: Troller[];
-
-  // @OneToMany(() => Troller, troller => troller.seller, { nullable: true })
-  // ordemNumbers: Troller[];
 
   @BeforeInsert()
   createDates() {

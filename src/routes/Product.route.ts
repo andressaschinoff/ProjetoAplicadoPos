@@ -7,13 +7,13 @@ import CreateProductService from '../services/Product.service';
 
 const routes = Router();
 
-function logRequest(request: Request, _response: Response, next: NextFunction) {
-  const { method, originalUrl } = request;
-  console.info(method + ': ' + originalUrl);
-  return next();
-}
+// function logRequest(request: Request, _response: Response, next: NextFunction) {
+//   const { method, originalUrl } = request;
+//   console.info(method + ': ' + originalUrl);
+//   return next();
+// }
 
-routes.use(logRequest);
+// routes.use(logRequest);
 
 routes.get('/', async (_request, response) => {
   try {
@@ -47,18 +47,13 @@ routes.get('/:fair', async (request, response) => {
 
 routes.post('/', async (request, response) => {
   try {
-    const productsReq = request.body as Product[];
+    const productReq = request.body as Product;
 
     const productService = new CreateProductService();
 
-    const products = [];
+    const product = await productService.execute({ ...productReq });
 
-    for (const prod of productsReq) {
-      const product = await productService.execute({ ...prod });
-      products.push(product);
-    }
-
-    return response.json(products);
+    return response.json(product);
   } catch (err) {
     // log erro
     console.error(err);

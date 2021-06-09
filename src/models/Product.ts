@@ -39,6 +39,9 @@ export default class Product {
   @Column({ type: 'enum', enum: Type })
   type: Type;
 
+  @Column({ nullable: true })
+  image: string;
+
   @ManyToOne(() => Fair, fair => fair.products, { nullable: false })
   @JoinColumn([{ name: 'fair_id', referencedColumnName: 'id' }])
   fair: Fair;

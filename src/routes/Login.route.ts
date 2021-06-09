@@ -14,13 +14,13 @@ const keys = {
 
 export const privateKey = fs.readFileSync(keys.private, 'utf-8');
 
-function logRequest(request: Request, _response: Response, next: NextFunction) {
-  const { method, originalUrl } = request;
-  console.info(method + ': ' + originalUrl);
-  return next();
-}
+// function logRequest(request: Request, _response: Response, next: NextFunction) {
+//   const { method, originalUrl } = request;
+//   console.info(method + ': ' + originalUrl);
+//   return next();
+// }
 
-routes.use(logRequest);
+// routes.use(logRequest);
 
 routes.post('/', async (req, res) => {
   const { email, password } = req.body;

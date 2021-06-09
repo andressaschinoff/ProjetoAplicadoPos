@@ -8,7 +8,9 @@ import ProductRepository from '../repositories/Product.repository';
 interface Request {
   name: string;
   price: number;
-  description: string;
+  description?: string;
+  countInStock?: number;
+  image?: string;
   type: Type;
   fair: Fair;
   unitsOfMeasure: string;
@@ -22,6 +24,8 @@ class CreateProductService {
     type,
     fair,
     unitsOfMeasure,
+    countInStock,
+    image,
   }: Request): Promise<Product> {
     const productsRepository = getCustomRepository(ProductRepository);
 
@@ -31,6 +35,8 @@ class CreateProductService {
       description,
       type,
       fair,
+      countInStock,
+      image,
       unitsOfMeasure,
     });
     await productsRepository.save(product);

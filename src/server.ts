@@ -1,7 +1,9 @@
 import 'reflect-metadata';
 import express from 'express';
 import session from 'express-session';
+import path from 'path';
 import cors from 'cors';
+import morgan from 'morgan';
 import passport from 'passport';
 import swaggerUi from 'swagger-ui-express';
 import swaggerFile from '../swagger.json';
@@ -33,6 +35,9 @@ declare module 'express-session' {
     token: string;
   }
 }
+
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan('dev'));
 
 const GoogleStrategy = GooglePassport.Strategy;
 

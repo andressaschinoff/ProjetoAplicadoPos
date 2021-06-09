@@ -12,10 +12,19 @@ class CreateTrollerService {
   public async execute({ user }: Request): Promise<Troller> {
     const trollerRepository = getRepository(Troller);
 
-    const troller = trollerRepository.create({
+    const createdTroller = trollerRepository.create({
       user,
     });
-    await trollerRepository.save(troller);
+    await trollerRepository.save(createdTroller);
+
+    const troller = await trollerRepository.findOne({
+      id: createdTroller.id,
+    });
+
+    if (!troller) {
+      return createdTroller;
+    }
+
     return troller;
   }
 }
