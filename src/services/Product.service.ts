@@ -5,7 +5,7 @@ import Fair from '../models/Fair';
 import Product from '../models/Product';
 import ProductRepository from '../repositories/Product.repository';
 
-interface Request {
+export interface ProductRequest {
   name: string;
   price: number;
   description?: string;
@@ -26,7 +26,7 @@ class CreateProductService {
     unitsOfMeasure,
     countInStock,
     image,
-  }: Request): Promise<Product> {
+  }: ProductRequest): Promise<Product> {
     const productsRepository = getCustomRepository(ProductRepository);
 
     const product = productsRepository.create({

@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 import express from 'express';
 import session from 'express-session';
-import path from 'path';
 import cors from 'cors';
 import morgan from 'morgan';
 import passport from 'passport';
@@ -10,9 +9,9 @@ import swaggerFile from '../swagger.json';
 import { googleConfig } from './configs/passportconfig';
 import GooglePassport from 'passport-google-oauth20';
 import BearerPassport from 'passport-http-bearer';
+import { privateKey } from './functions/Auth';
 import router from './router';
 import './database';
-import { privateKey } from './routes/Login.route';
 
 const app = express();
 
@@ -20,6 +19,12 @@ app.use(cors());
 app.use(express.json());
 
 app.set('trust proxy', 1);
+
+declare module 'express-session' {
+  interface CookieOptions {
+    token?: string;
+  }
+}
 
 app.use(
   session({
@@ -29,12 +34,6 @@ app.use(
     cookie: { secure: true, httpOnly: true, maxAge: 3600000 * 24 },
   }),
 );
-
-declare module 'express-session' {
-  interface SessionData {
-    token: string;
-  }
-}
 
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));

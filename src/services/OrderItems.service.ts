@@ -3,6 +3,7 @@ import Product from '../models/Product';
 import OrderItem from '../models/OrderItem';
 import Troller from '../models/Troller';
 import ProductRepository from '../repositories/Product.repository';
+import { responseLog } from '../functions/Logs';
 
 interface Request {
   id?: string;
@@ -11,7 +12,7 @@ interface Request {
   troller: Troller;
 }
 
-class CreateOrderItensService {
+class CreateOrderItemsService {
   public async execute({
     id,
     quantity,
@@ -29,30 +30,43 @@ class CreateOrderItensService {
       throw new Error(`Error while looking for product id ${product.id}`);
     }
 
-    const total = findedProd.price * quantity;
-
     if (!!id) {
       const orderItem = await orderItemRepo.findOne({
         where: { id },
       });
       if (!!orderItem) {
+        const qty = quantity + orderItem.quantity;
+        const total = findedProd.price * qty;
         await orderItemRepo.update(orderItem.id, {
-          quantity,
-          total,
+          quantity: qty,
+          total: total,
         });
         return;
       }
     }
 
-    const newOrderItens = orderItemRepo.create({
+    const order = await orderItemRepo.findOne({
+      where: { product: { id: product.id }, troller: { id: troller.id } },
+      relations: ['troller'],
+    });
+
+    if (!!order) {
+      const qty = order.quantity + quantity;
+      const total = findedProd.price * qty;
+      await orderItemRepo.update(order.id, { quantity: qty, total });
+      return;
+    }
+
+    const total = quantity * findedProd.price;
+    const newOrderItems = orderItemRepo.create({
       quantity,
       total,
       product: findedProd,
       troller,
     });
 
-    await orderItemRepo.save(newOrderItens);
+    await orderItemRepo.save(newOrderItems);
   }
 }
 
-export default CreateOrderItensService;
+export default CreateOrderItemsService;

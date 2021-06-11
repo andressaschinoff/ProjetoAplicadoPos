@@ -1,81 +1,51 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router } from 'express';
 import { getCustomRepository } from 'typeorm';
+import { getUserByToken, isSeller } from '../functions/Auth';
+import { create, getAll, getOne, remove, update } from '../functions/Fair';
+import { responseLog } from '../functions/Logs';
+import Fair from '../models/Fair';
+import User from '../models/User';
 
 import FairRepository from '../repositories/Fair.repository';
-import { CreateFairService, ScoreFairService } from '../services/Fair.service';
+import {
+  CreateFairService,
+  FairRequest,
+  ScoreFairService,
+} from '../services/Fair.service';
 
 const routes = Router();
 
-// function logRequest(request: Request, _response: Response, next: NextFunction) {
-//   const { method, originalUrl } = request;
-//   console.info(method + ': ' + originalUrl);
-//   return next();
-// }
-
-// routes.use(logRequest);
-
 routes.get('/', async (_request, response) => {
-  try {
-    const fairRepository = getCustomRepository(FairRepository);
+  const { status, error, fairs } = await getAll();
 
-    const fairs = await fairRepository.find();
-
-    return response.json(fairs);
-  } catch (err) {
-    // log erro
-    console.error(err);
-    return response.status(400).json({ error: err.message });
+  if (status !== 200) {
+    return response.status(status).json({ error });
   }
+
+  return response.status(status).json(fairs);
 });
 
-routes.post('/', async (request, response) => {
-  try {
-    const {
-      name,
-      zipcode,
-      address,
-      opening,
-      closing,
-      weekdays,
-      deliveryPrice,
-      types,
-    } = request.body;
+routes.post('/', getUserByToken, isSeller, async (request, response) => {
+  const body = request.body as FairRequest;
+  const user = request.user as User;
+  const { status, error, fair } = await create(user.id, body);
 
-    // pegar user e  vincular a feira registrada
-
-    const newFair = new CreateFairService();
-
-    const fair = await newFair.execute({
-      name,
-      zipcode,
-      address,
-      opening,
-      closing,
-      weekdays,
-      deliveryPrice,
-      types,
-    });
-
-    return response.json(fair);
-  } catch (err) {
-    // log erro
-    console.error(err);
-    return response.status(400).json({ error: err.message });
+  if (status !== 200) {
+    return response.status(status).json({ error });
   }
+
+  return response.status(status).json(fair);
 });
 
 routes.get('/:id', async (request, response) => {
-  try {
-    const { id } = request.params;
+  const { id } = request.params;
+  const { status, error, fair } = await getOne(id);
 
-    const fairRepository = getCustomRepository(FairRepository);
-    const fair = await fairRepository.findOne({ id });
-
-    return response.json(fair);
-  } catch (err) {
-    console.error(err);
-    return response.status(400).json({ error: err.message });
+  if (status !== 200) {
+    return response.status(status).json({ error });
   }
+
+  return response.status(status).json(fair);
 });
 
 routes.get('/filter/opening', async (_request, response) => {
@@ -85,7 +55,7 @@ routes.get('/filter/opening', async (_request, response) => {
 
     return fairs;
   } catch (err) {
-    console.error(err);
+    responseLog(err);
     return response.status(400).json({ error: err.message });
   }
 });
@@ -112,45 +82,21 @@ routes.get('/filter?', async (request, response) => {
 
     return response.json(fairs);
   } catch (err) {
-    console.error(err);
+    responseLog(err);
     return response.status(400).json({ error: err.message });
   }
 });
 
-routes.put('/:id', async (request, response) => {
-  try {
-    const { id } = request.params;
-    const {
-      name,
-      zipcode,
-      address,
-      opening,
-      closing,
-      weekdays,
-      deliveryPrice,
-      types,
-    } = request.body;
+routes.put('/:id', getUserByToken, isSeller, async (request, response) => {
+  const { id } = request.params;
+  const body = request.body as Partial<Fair> | Fair;
+  const { status, error, fair } = await update(id, body);
 
-    const fairRepository = getCustomRepository(FairRepository);
-
-    await fairRepository.update(id, {
-      name,
-      zipcode,
-      address,
-      opening,
-      closing,
-      weekdays,
-      deliveryPrice,
-      types,
-    });
-
-    const updateFair = await fairRepository.findByIds([id]);
-
-    return response.json(updateFair);
-  } catch (err) {
-    console.error(err);
-    return response.status(400).json({ error: err.message });
+  if (status !== 200) {
+    return response.status(status).json({ error });
   }
+
+  return response.status(status).json(fair);
 });
 
 routes.put('/:id/score', async (request, response) => {
@@ -163,23 +109,21 @@ routes.put('/:id/score', async (request, response) => {
 
     return response.json(updateFair);
   } catch (err) {
-    console.error(err);
+    responseLog(err);
     return response.status(400).json({ error: err.message });
   }
 });
 
-routes.delete('/:id', async (request, response) => {
-  try {
-    const { id } = request.params;
+routes.delete('/:id', getUserByToken, isSeller, async (request, response) => {
+  const { id } = request.params;
 
-    const fairRepository = getCustomRepository(FairRepository);
-    await fairRepository.delete(id);
+  const { status, error } = await remove(id);
 
-    return response.status(204).json();
-  } catch (err) {
-    console.error(err);
-    return response.status(400).json({ error: err.message });
+  if (status !== 200) {
+    return response.status(status).json({ error });
   }
+
+  return response.status(status).end();
 });
 
 export { routes as fairRoute };

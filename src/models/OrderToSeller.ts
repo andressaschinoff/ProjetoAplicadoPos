@@ -23,11 +23,11 @@ export default class OrderToSeller {
   @Column()
   active: boolean;
 
-  @ManyToOne(() => User, user => user.orderSellers)
+  @ManyToOne(() => User, user => user.orderSellers, { eager: true })
   @JoinColumn([{ name: 'user_id', referencedColumnName: 'id' }])
   user: User;
 
-  @ManyToOne(() => Troller, troller => troller.orderSellers)
+  @ManyToOne(() => Troller, troller => troller.orderSellers, { eager: true })
   @JoinColumn([{ name: 'troller_id', referencedColumnName: 'id' }])
   troller: Troller;
 

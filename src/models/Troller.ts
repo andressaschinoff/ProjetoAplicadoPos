@@ -29,15 +29,14 @@ export default class Troller {
   @Column({ type: 'boolean', default: true })
   active: boolean;
 
-  @OneToMany(() => OrderItem, orderItens => orderItens.troller, {
+  @OneToMany(() => OrderItem, orderItems => orderItems.troller, {
     nullable: true,
     eager: true,
   })
-  orderItens: OrderItem[];
+  orderItems: OrderItem[];
 
   @OneToMany(() => OrderToSeller, orderSeller => orderSeller.troller, {
     nullable: true,
-    eager: true,
   })
   orderSellers: OrderToSeller[];
 

@@ -6,10 +6,10 @@ export function logRequest(req: Request, _res: Response, next: NextFunction) {
   return next();
 }
 
-export const resLog = (next: NextFunction, err?: Error) => {
+export const responseLog = (err?: Error | any, entity?: any) => {
   console.log({
     success: !!err ? false : true,
     message: !!err ? err.message : 'OK',
+    entity: entity,
   });
-  return next();
 };

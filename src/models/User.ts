@@ -61,12 +61,12 @@ export default class User {
 
   @OneToMany(() => OrderToSeller, orderSeller => orderSeller.user, {
     nullable: true,
-    eager: true,
   })
   orderSellers: OrderToSeller[];
 
   @ManyToOne(() => Fair, fair => fair.users, {
     nullable: true,
+    eager: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn([{ name: 'fair_id', referencedColumnName: 'id' }])

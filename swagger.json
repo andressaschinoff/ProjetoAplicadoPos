@@ -22,6 +22,27 @@
         "responses": {}
       }
     },
+    "/api/image/": {
+      "post": {
+        "tags": [],
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "501": {
+            "description": "Not Implemented"
+          }
+        }
+      }
+    },
     "/api/login/": {
       "post": {
         "tags": [],
@@ -33,6 +54,9 @@
             "schema": {
               "type": "object",
               "properties": {
+                "token": {
+                  "example": "any"
+                },
                 "email": {
                   "example": "any"
                 },
@@ -44,6 +68,13 @@
           }
         ],
         "responses": {
+          "40": {},
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
           "401": {
             "description": "Unauthorized"
           }
@@ -55,7 +86,14 @@
         "tags": [],
         "description": "",
         "parameters": [],
-        "responses": {}
+        "responses": {
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
       }
     },
     "/api/product/": {
@@ -66,27 +104,20 @@
         "responses": {
           "400": {
             "description": "Bad Request"
-          }
-        }
-      },
-      "post": {
-        "tags": [],
-        "description": "",
-        "parameters": [],
-        "responses": {
-          "400": {
-            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
-    "/api/product/{fair}": {
+    "/api/product/{fairId}": {
       "get": {
         "tags": [],
         "description": "",
         "parameters": [
           {
-            "name": "fair",
+            "name": "fairId",
             "in": "path",
             "required": true,
             "type": "string"
@@ -95,11 +126,34 @@
         "responses": {
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "fairId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
-    "/api/product/id/{id}": {
+    "/api/product/one/{id}": {
       "get": {
         "tags": [],
         "description": "",
@@ -114,6 +168,9 @@
         "responses": {
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -142,6 +199,9 @@
         "responses": {
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -156,35 +216,14 @@
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "obj",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "example": "any"
-                },
-                "type": {
-                  "example": "any"
-                },
-                "description": {
-                  "example": "any"
-                },
-                "price": {
-                  "example": "any"
-                },
-                "fair": {
-                  "example": "any"
-                }
-              }
-            }
           }
         ],
         "responses": {
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -200,11 +239,11 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "No Content"
-          },
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -217,50 +256,22 @@
         "responses": {
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
       "post": {
         "tags": [],
         "description": "",
-        "parameters": [
-          {
-            "name": "obj",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "example": "any"
-                },
-                "zipcode": {
-                  "example": "any"
-                },
-                "address": {
-                  "example": "any"
-                },
-                "opening": {
-                  "example": "any"
-                },
-                "closing": {
-                  "example": "any"
-                },
-                "weekdays": {
-                  "example": "any"
-                },
-                "deliveryPrice": {
-                  "example": "any"
-                },
-                "types": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -280,6 +291,9 @@
         "responses": {
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -292,44 +306,14 @@
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "obj",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "example": "any"
-                },
-                "zipcode": {
-                  "example": "any"
-                },
-                "address": {
-                  "example": "any"
-                },
-                "opening": {
-                  "example": "any"
-                },
-                "closing": {
-                  "example": "any"
-                },
-                "weekdays": {
-                  "example": "any"
-                },
-                "deliveryPrice": {
-                  "example": "any"
-                },
-                "types": {
-                  "example": "any"
-                }
-              }
-            }
           }
         ],
         "responses": {
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -345,11 +329,11 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "No Content"
-          },
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -362,6 +346,9 @@
         "responses": {
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -390,6 +377,9 @@
         "responses": {
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -421,6 +411,9 @@
         "responses": {
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -433,6 +426,9 @@
         "responses": {
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -445,58 +441,27 @@
         "responses": {
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
       "post": {
         "tags": [],
         "description": "",
-        "parameters": [
-          {
-            "name": "obj",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "example": "any"
-                },
-                "cpf": {
-                  "example": "any"
-                },
-                "email": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
-                },
-                "telephone": {
-                  "example": "any"
-                },
-                "fair": {
-                  "example": "any"
-                },
-                "role": {
-                  "example": "any"
-                },
-                "address": {
-                  "example": "any"
-                },
-                "zipcode": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
-    "/api/user/id/{id}": {
+    "/api/user/{id}": {
       "get": {
         "tags": [],
         "description": "",
@@ -511,11 +476,12 @@
         "responses": {
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
-      }
-    },
-    "/api/user/{id}": {
+      },
       "put": {
         "tags": [],
         "description": "",
@@ -525,38 +491,14 @@
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "obj",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "example": "any"
-                },
-                "cpf": {
-                  "example": "any"
-                },
-                "email": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
-                },
-                "telephone": {
-                  "example": "any"
-                },
-                "fair": {
-                  "example": "any"
-                }
-              }
-            }
           }
         ],
         "responses": {
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -572,11 +514,11 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "No Content"
-          },
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -589,19 +531,35 @@
         "responses": {
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
-    "/api/troller/empty": {
+    "/api/troller/active": {
       "get": {
         "tags": [],
         "description": "",
-        "parameters": [],
-        "responses": {}
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
       }
     },
-    "/api/troller/user/{id}/active": {
+    "/api/troller/seller/{id}": {
       "get": {
         "tags": [],
         "description": "",
@@ -616,6 +574,9 @@
         "responses": {
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -635,6 +596,9 @@
         "responses": {
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -647,29 +611,14 @@
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "obj",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "orderItens": {
-                  "example": "any"
-                },
-                "fair": {
-                  "example": "any"
-                },
-                "user": {
-                  "example": "any"
-                }
-              }
-            }
           }
         ],
         "responses": {
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -690,17 +639,20 @@
           },
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
-    "/api/troller/user/{id}/all": {
+    "/api/troller/all/{userId}": {
       "get": {
         "tags": [],
         "description": "",
         "parameters": [
           {
-            "name": "id",
+            "name": "userId",
             "in": "path",
             "required": true,
             "type": "string"
@@ -709,12 +661,15 @@
         "responses": {
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
-    "/api/troller/exclude/{id}": {
-      "delete": {
+    "/api/troller/checkout/{id}": {
+      "put": {
         "tags": [],
         "description": "",
         "parameters": [
@@ -726,11 +681,11 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "No Content"
-          },
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }

@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import multer from 'multer';
-import { resLog } from './Logs';
+import { responseLog } from './Logs';
 
 const storage = multer.diskStorage({
   destination: function (_req, _file, callback) {
@@ -19,24 +19,23 @@ export const upload = multer({
   storage: storage,
 });
 
-export function imageUpload(req: Request, res: Response, next: NextFunction) {
+export function imageUpload(req: Request, res: Response) {
   try {
     if (!req.file) {
-      resLog(next);
+      responseLog();
       return res.status(501).send({
         success: false,
         message: 'This entity don`t accept image files.',
       });
     }
-    resLog(next);
+    responseLog();
     return res.status(200).send({
       success: true,
       message: 'File uploaded!',
       filename: req.file.filename,
     });
   } catch (error) {
-    resLog(next);
-    console.error(error);
+    responseLog(error);
     return res.status(400).json({ error: error.message });
   }
 }

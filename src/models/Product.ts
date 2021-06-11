@@ -42,12 +42,14 @@ export default class Product {
   @Column({ nullable: true })
   image: string;
 
-  @ManyToOne(() => Fair, fair => fair.products, { nullable: false })
+  @ManyToOne(() => Fair, fair => fair.products, {
+    nullable: false,
+  })
   @JoinColumn([{ name: 'fair_id', referencedColumnName: 'id' }])
   fair: Fair;
 
-  @OneToMany(() => OrderItem, orderItens => orderItens.product)
-  orderItens: OrderItem[];
+  @OneToMany(() => OrderItem, orderItems => orderItems.product)
+  orderItems: OrderItem[];
 
   @CreateDateColumn({
     name: 'create_at',

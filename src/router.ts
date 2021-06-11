@@ -6,8 +6,9 @@ import { typeRoute } from './routes/Type.route';
 import { userRoute } from './routes/User.route';
 import { trollerRoute } from './routes/Troller.route';
 import { imageRoute } from './routes/Image.route';
-import { authJWT, loginRoute } from './routes/Login.route';
+import { loginRoute } from './routes/Login.route';
 import { logRequest } from './functions/Logs';
+import { isSeller, getUserByToken } from './functions/Auth';
 
 const router = express();
 
@@ -15,11 +16,9 @@ router.use(cors());
 
 router.use(logRequest);
 router.use('/assets', express.static(__dirname + '/assets'));
-router.use('/image', imageRoute);
+router.use('/image', getUserByToken, isSeller, imageRoute);
 router.use('/login', loginRoute);
 router.use('/product', productRoute);
-// router.use('/product', authJWT, productRoute);
-// router.use('/fair', authJWT, fairRoute);
 router.use('/fair', fairRoute);
 router.use('/type', typeRoute);
 router.use('/user', userRoute);

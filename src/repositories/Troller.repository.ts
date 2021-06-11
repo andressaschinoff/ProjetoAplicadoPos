@@ -1,65 +1,71 @@
 import { EntityRepository, getRepository, Repository } from 'typeorm';
-import Fair from '../models/Fair';
 import OrderItem from '../models/OrderItem';
+import Product from '../models/Product';
 import Troller from '../models/Troller';
-import User from '../models/User';
 
 @EntityRepository(Troller)
 class TrollerRepository extends Repository<Troller> {
   public async customUpdate(
     id: string,
-    user?: User,
-    fair?: Fair,
-  ): Promise<Troller | null> {
+    troller: Troller | Partial<Troller>,
+  ): Promise<Troller> {
     try {
-      const trollerRepository = getRepository(Troller);
-      const orderItemRepo = getRepository(OrderItem);
+      const trollerRepo = getRepository(Troller);
+      const current = await trollerRepo.findOne({ id });
 
-      const orderItens = await orderItemRepo.find({
-        where: { troller: { id } },
-      });
-
-      let currentUser = user;
-
-      if (!currentUser) {
-        const oldTroller = await trollerRepository.findOne({
-          where: { id },
-          relations: ['user'],
-        });
-        currentUser = oldTroller?.user;
+      if (!current) {
+        throw new Error(`Troller id ${id} not found.`);
       }
 
-      const subtotal = orderItens?.reduce((acc, curr) => acc + curr.total, 0);
-      const total =
-        subtotal + (!!fair?.deliveryPrice ? fair?.deliveryPrice : 10);
+      const orderRepo = getRepository(OrderItem);
+      const orderItems = await orderRepo.find({
+        where: { troller: { id } },
+        relations: ['troller'],
+      });
 
-      await trollerRepository.update(id, {
-        fair,
-        user: currentUser,
+      const { user: currentUser, fair: currentFair } = current;
+
+      const { user } = troller;
+
+      if (!currentUser && !!user) {
+        current.user = user;
+      }
+
+      if (!currentFair && !!orderItems[0]) {
+        const productId = orderItems[0].product.id;
+        const prodRepo = getRepository(Product);
+        const product = await prodRepo.findOne({
+          where: { id: productId },
+          relations: ['fair'],
+        });
+        if (!!product) {
+          const fair = product.fair;
+          current.fair = fair;
+        }
+      }
+
+      const delivery = current.fair?.deliveryPrice || 10;
+
+      const subtotal = orderItems.reduce((acc, curr) => acc + curr.total, 0);
+      const total = subtotal + delivery;
+
+      await trollerRepo.update(id, {
+        fair: current.fair,
+        user: current.user,
+        active: troller.active,
         subtotal,
         total,
       });
 
-      // const troller = await trollerRepository
-      //   .createQueryBuilder('troller')
-      //   .leftJoinAndSelect('troller.user', 'user')
-      //   .leftJoinAndSelect('troller.fair', 'fair')
-      //   .leftJoinAndSelect('troller.orderItens', 'orderItem')
-      //   .leftJoinAndSelect('orderItem.product', 'product')
-      //   .where('troller.id = :id', { id: id })
-      //   .getOne();
-      const updatedTroller = await trollerRepository.findOne({ id });
+      const updated = await trollerRepo.findOne({ where: { id } });
 
-      console.log(updatedTroller);
-
-      if (!updatedTroller) {
+      if (!updated) {
         throw new Error(`Error while is updating troller id ${id}`);
       }
 
-      return updatedTroller;
+      return updated;
     } catch (error) {
-      console.error(error);
-      return null;
+      throw error;
     }
   }
 }

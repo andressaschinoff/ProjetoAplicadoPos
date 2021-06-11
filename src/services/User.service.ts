@@ -4,7 +4,7 @@ import User from '../models/User';
 import Fair from '../models/Fair';
 import { genSalt, hash } from 'bcrypt';
 
-interface RequestPost {
+export interface UserRequest {
   name: string;
   cpf: string;
   email: string;
@@ -27,7 +27,7 @@ class CreateUserService {
     role,
     address,
     zipcode,
-  }: RequestPost): Promise<User> {
+  }: UserRequest): Promise<User> {
     const userRepository = getRepository(User);
 
     if (role === 'buyer' && (!address || !zipcode)) {

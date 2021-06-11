@@ -23,11 +23,11 @@ export default class OrderItem {
   @Column({ type: 'float', default: 0 })
   total: number;
 
-  @ManyToOne(() => Product, product => product.orderItens, { eager: true })
+  @ManyToOne(() => Product, product => product.orderItems, { eager: true })
   @JoinColumn([{ name: 'product_id', referencedColumnName: 'id' }])
   product: Product;
 
-  @ManyToOne(() => Troller, troller => troller.orderItens)
+  @ManyToOne(() => Troller, troller => troller.orderItems)
   @JoinColumn([{ name: 'troller_id', referencedColumnName: 'id' }])
   troller: Troller;
 

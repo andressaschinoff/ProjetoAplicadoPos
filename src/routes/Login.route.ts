@@ -1,102 +1,44 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import { sign, verify } from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
-import { getRepository } from 'typeorm';
-import fs from 'fs';
-var path = require('path');
-import User from '../models/User';
+import { Router } from 'express';
+import { auth } from '../functions/Auth';
+import { responseLog } from '../functions/Logs';
 
 const routes = Router();
-const keys = {
-  private: path.resolve('jwtRS256.key'),
-  public: path.resolve('jwtRS256.key.pub'),
-};
-
-export const privateKey = fs.readFileSync(keys.private, 'utf-8');
-
-// function logRequest(request: Request, _response: Response, next: NextFunction) {
-//   const { method, originalUrl } = request;
-//   console.info(method + ': ' + originalUrl);
-//   return next();
-// }
-
-// routes.use(logRequest);
 
 routes.post('/', async (req, res) => {
-  const { email, password } = req.body;
-
-  if (email && password) {
-    const resp = await findUser(email, password);
-    if (!!resp.token) {
-      req.session.token = resp.token;
+  try {
+    const { email, password } = req.body;
+    if (!email && !password) {
+      const err = new Error('Email or password not provided!');
+      responseLog(err);
+      return res.status(400).json({ error: err.message });
     }
-    return resp.auth
-      ? res.json({ token: resp.token })
-      : res.status(401).json(resp.message);
-  }
+    const { success, error, token } = await auth(email, password);
+    if (!success) {
+      responseLog(error);
+      return res.status(401).json({ error });
+    }
 
-  return res.status(401).json({ message: 'Empty user' });
+    responseLog();
+    req.body.token = token;
+    return res.status(200).json({ token });
+  } catch (error) {
+    responseLog(error);
+    return res.status(40).json({ error: error.message });
+  }
 });
 
-async function findUser(email: string, password: string) {
-  try {
-    const finded = await getRepository(User)
-      .createQueryBuilder('user')
-      .where('user.email = :email', { email: email })
-      .addSelect('user.password')
-      .getOne();
-
-    if (!!finded) {
-      const pwdMatches = bcrypt.compareSync(password, finded.password);
-
-      if (pwdMatches) {
-        const { password, ...user } = finded;
-        var token = sign({ ...user }, privateKey, {
-          expiresIn: '1d',
-          algorithm: 'RS256',
-        });
-
-        return { auth: true, token: token };
-      }
-      return { auth: false, message: 'Incorrect password' };
-    }
-    return { auth: false, message: 'Invalid user' };
-  } catch (err) {
-    console.log(err);
-    return { auth: false, message: err };
-  }
-}
-
-export const authJWT = (req: Request, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization;
-
-  if (authHeader) {
-    const token = authHeader.slice(7, authHeader.length);
-
-    verify(token, privateKey, (err, decode) => {
-      if (err) {
-        return res.json({ error: err.message });
-      }
-      req.user = decode;
-      next();
-    });
-  } else {
-    res.status(401).send({ error: 'Token is not supplied.' });
-  }
-};
-
-const isAdmin = (req: Request, res: Response, next: NextFunction) => {
-  if (req.user && req.user) {
-    // if (req.user && req.user.isAdmin) {
-    return next();
-  }
-  return res.status(401).send({ error: 'Admin Token is not valid.' });
-};
-
 routes.get('/logout', function (req, res) {
-  req.session.destroy(err => console.error(err));
+  req.session.destroy(err => responseLog(err));
   req.logout();
   res.redirect('/');
 });
 
 export { routes as loginRoute };
+function authenticate(
+  email: any,
+  password: any,
+):
+  | { auth: any; error: any; token: any }
+  | PromiseLike<{ auth: any; error: any; token: any }> {
+  throw new Error('Function not implemented.');
+}
