@@ -6,10 +6,13 @@ import {
   BeforeInsert,
   BeforeUpdate,
   PrimaryGeneratedColumn,
-  ManyToMany,
   ManyToOne,
+  OneToMany,
+  JoinColumn,
 } from 'typeorm';
-import Products from './Products';
+import Fair from './Fair';
+import OrderItem from './OrderItem';
+import OrderToSeller from './OrderToSeller';
 import User from './User';
 
 @Entity('troller')
@@ -18,15 +21,31 @@ export default class Troller {
   id: string;
 
   @Column({ type: 'float', default: 0 })
+  subtotal: number;
+
+  @Column({ type: 'float', default: 0 })
   total: number;
 
   @Column({ type: 'boolean', default: true })
   active: boolean;
 
-  @ManyToMany(() => Products, products => products.trollers, { nullable: true })
-  products: Products[];
+  @OneToMany(() => OrderItem, orderItems => orderItems.troller, {
+    nullable: true,
+    eager: true,
+  })
+  orderItems: OrderItem[];
 
-  @ManyToOne(() => User, user => user.trollers, { nullable: true })
+  @OneToMany(() => OrderToSeller, orderSeller => orderSeller.troller, {
+    nullable: true,
+  })
+  orderSellers: OrderToSeller[];
+
+  @ManyToOne(() => Fair, fair => fair.trollers, { nullable: true, eager: true })
+  @JoinColumn([{ name: 'fair_id', referencedColumnName: 'id' }])
+  fair: Fair;
+
+  @ManyToOne(() => User, user => user.trollers, { nullable: true, eager: true })
+  @JoinColumn([{ name: 'user_id', referencedColumnName: 'id' }])
   user: User;
 
   @CreateDateColumn({

@@ -4,7 +4,7 @@ import { Type } from '../enum/Type';
 import Fair from '../models/Fair';
 import FairRepository from '../repositories/Fair.repository';
 
-interface Request {
+export interface FairRequest {
   name: string;
   zipcode: string;
   address: string;
@@ -25,7 +25,7 @@ class CreateFairService {
     weekdays,
     deliveryPrice,
     types,
-  }: Request): Promise<Fair> {
+  }: FairRequest): Promise<Fair> {
     const fairRepository = getCustomRepository(FairRepository);
 
     const newWeekdays = weekdays.join('|');
@@ -54,15 +54,25 @@ class ScoreFairService {
     }: {
       score: number;
     },
-  ): Promise<Fair> {
+  ): Promise<Fair | { error: string }> {
     const fairRepository = getCustomRepository(FairRepository);
 
-    const currentFair = (await fairRepository.findByIds([id]))[0];
+    const currentFair = await fairRepository.findOne({ id });
+
+    if (!currentFair) {
+      const err = new Error(`Fair id ${id} not found!`);
+      return { error: err.message };
+    }
 
     const newScore = (currentFair.score + score) / currentFair.numberOfScores;
     await fairRepository.update(id, { ...currentFair, score: newScore });
 
-    const fair = (await fairRepository.findByIds([id]))[0];
+    const fair = await fairRepository.findOne({ id });
+
+    if (!fair) {
+      const err = new Error(`Fair id ${id} not found!`);
+      return { error: err.message };
+    }
 
     return fair;
   }

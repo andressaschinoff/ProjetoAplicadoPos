@@ -1,153 +1,110 @@
-import { genSalt, hash } from 'bcrypt';
-import { Router, Request, Response, NextFunction } from 'express';
-import { getRepository } from 'typeorm';
+import { Router } from 'express';
+import { getUserByToken } from '../functions/Auth';
+import { create, getAll, getOne, remove, update } from '../functions/User';
 
 import User from '../models/User';
-import CreateUserService from '../services/User.service';
+import { UserRequest } from '../services/User.service';
 
 const routes = Router();
 
-function logRequest(request: Request, _response: Response, next: NextFunction) {
-  const { method, originalUrl } = request;
-  console.info(method + ': ' + originalUrl);
-  return next();
-}
+// pensar soobre auth
 
-routes.use(logRequest);
-
+// routes.get('/', getUserByToken, async (_request, response) => {
 routes.get('/', async (_request, response) => {
-  try {
-    const userRepository = getRepository(User);
+  const { status, error, users } = await getAll();
 
-    const users = await userRepository.find();
-
-    return response.json(users);
-  } catch (err) {
-    // log erro
-    console.error(err);
-    return response.status(400).json({ error: err.message });
+  if (status !== 200) {
+    return response.status(status).json({ error });
   }
+
+  return response.status(status).json(users);
 });
 
 routes.post('/', async (request, response) => {
-  try {
-    const {
-      name,
-      cpf,
-      email,
-      password,
-      telephone,
-      fair,
-      role,
-      address,
-      zipcode,
-    } = request.body;
+  const data = request.body as UserRequest;
+  const { status, error, user } = await create(data);
 
-    const userService = new CreateUserService();
-    const newUser = await userService.execute({
-      name,
-      cpf,
-      email,
-      password,
-      telephone,
-      fair,
-      role,
-      address,
-      zipcode,
-    });
-    return response.json(newUser);
-  } catch (err) {
-    // log erro
-    console.error(err);
-    return response.status(400).json({ error: err.message });
+  if (status !== 200) {
+    return response.status(status).json({ error });
   }
+
+  return response.status(status).json(user);
 });
 
-routes.get('/id/:id', async (request, response) => {
-  try {
-    const { id } = request.params;
+routes.get('/:id', async (request, response) => {
+  // routes.get('/:id', getUserByToken, async (request, response) => {
+  const { id } = request.params;
+  const { status, error, user } = await getOne(id);
 
-    const userRepository = getRepository(User);
-    const user = await userRepository.findByIds([id]);
-
-    return response.json(user);
-  } catch (err) {
-    console.error(err);
-    return response.status(400).json({ error: err.message });
+  if (status !== 200) {
+    return response.status(status).json({ error });
   }
+
+  return response.status(status).json(user);
 });
 
+// routes.put('/:id', getUserByToken, async (request, response) => {
 routes.put('/:id', async (request, response) => {
-  try {
-    const { id } = request.params;
-    const { name, cpf, email, password, telephone, fair } = request.body;
+  const { id } = request.params;
+  const body = request.body as Partial<User> | User;
+  const { status, error, user } = await update(id, body);
 
-    const userRepository = getRepository(User);
-
-    const currentUser = {
-      name,
-      cpf,
-      email,
-      password,
-      telephone,
-      fair,
-    };
-    await genSalt(10, async (_err, salt) => {
-      hash(password, salt, async (_err, hash) => {
-        currentUser.password = hash;
-        await userRepository.update(id, {
-          name: currentUser.name,
-          cpf: currentUser.cpf,
-          email: currentUser.email,
-          password: currentUser.password,
-          telephone: currentUser.telephone,
-        });
-      });
-    });
-
-    const updateUser = await userRepository.findByIds([id]);
-
-    return response.json(updateUser);
-  } catch (err) {
-    console.error(err);
-    return response.status(400).json({ error: err.message });
+  if (status !== 200) {
+    return response.status(status).json({ error });
   }
+
+  return response.status(status).json(user);
 });
 
+// routes.delete('/:id', getUserByToken, async (request, response) => {
 routes.delete('/:id', async (request, response) => {
-  try {
-    const { id } = request.params;
+  const { id } = request.params;
+  const { status, error } = await remove(id);
 
-    const userRepository = getRepository(User);
-    await userRepository.delete(id);
-
-    return response.status(204).json();
-  } catch (err) {
-    console.error(err);
-    return response.status(400).json({ error: err.message });
+  if (status !== 204) {
+    return response.status(status).json({ error });
   }
+
+  return response.status(status).end();
 });
 
-export default async function getTrollerActive(id: string) {
-  try {
-    const userRepository = getRepository(User);
-    const user = await userRepository.findOne({
-      relations: ['trollers'],
-      where: { id },
-    });
+// export async function getTrollerActive(id: string) {
+//   try {
+//     const userRepository = getRepository(User);
+//     const user = await userRepository.findOne({
+//       relations: ['trollers'],
+//       where: { id },
+//     });
 
-    if (!user) {
-      throw new Error(`Don't have user id ${id}`);
-    }
-    console.log(user);
+//     if (!user) {
+//       throw new Error(`Don't have user id ${id}`);
+//     }
 
-    const troller = user?.trollers.filter(({ active }) => active === true);
+//     const troller = user?.trollers.filter(({ active }) => active === true);
 
-    return { troller, user };
-  } catch (err) {
-    console.error(err);
-    return { error: err.message };
-  }
-}
+//     return { troller, user };
+//   } catch (err) {
+//     console.error(err);
+//     return { error: err.message };
+//   }
+// }
+
+// export async function getAllTrollers(id: string) {
+//   try {
+//     const userRepository = getRepository(User);
+//     const user = await userRepository.findOne({
+//       relations: ['trollers'],
+//       where: { id },
+//     });
+
+//     if (!user) {
+//       throw new Error(`Don't have user id ${id}`);
+//     }
+//     return { user };
+//   } catch (err) {
+//     console.error(err);
+//     return { error: err.message };
+//   }
+// }
 
 export { routes as userRoute };

@@ -1,4 +1,5 @@
 import { EntityRepository, Repository, Like } from 'typeorm';
+import { responseLog } from '../functions/Logs';
 
 import Product from '../models/Product';
 
@@ -16,7 +17,7 @@ class ProductRepository extends Repository<Product> {
             });
       return products || null;
     } catch (error) {
-      console.error(error);
+      responseLog(error);
       return null;
     }
   }
@@ -28,7 +29,7 @@ class ProductRepository extends Repository<Product> {
       });
       return products || null;
     } catch (error) {
-      console.error(error);
+      responseLog(error);
       return null;
     }
   }

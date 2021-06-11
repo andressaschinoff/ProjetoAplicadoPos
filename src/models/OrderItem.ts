@@ -5,29 +5,31 @@ import {
   CreateDateColumn,
   BeforeInsert,
   BeforeUpdate,
-  OneToOne,
   PrimaryGeneratedColumn,
-  ManyToMany,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import Product from './Product';
 import Troller from './Troller';
 
-@Entity('products')
-export default class Products {
+@Entity('order_item')
+export default class OrderItem {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
   quantity: number;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', default: 0 })
   total: number;
 
-  @OneToOne(() => Product, product => product.products)
+  @ManyToOne(() => Product, product => product.orderItems, { eager: true })
+  @JoinColumn([{ name: 'product_id', referencedColumnName: 'id' }])
   product: Product;
 
-  @ManyToMany(() => Troller, troller => troller.products)
-  trollers: Troller[];
+  @ManyToOne(() => Troller, troller => troller.orderItems)
+  @JoinColumn([{ name: 'troller_id', referencedColumnName: 'id' }])
+  troller: Troller;
 
   @CreateDateColumn({
     name: 'create_at',

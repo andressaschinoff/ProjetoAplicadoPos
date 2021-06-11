@@ -1,72 +1,44 @@
-import { Router, Request, Response, NextFunction, response } from 'express';
-import { sign, verify } from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
-import { getRepository } from 'typeorm';
-import fs from 'fs';
-var path = require('path');
-import User from '../models/User';
+import { Router } from 'express';
+import { auth } from '../functions/Auth';
+import { responseLog } from '../functions/Logs';
 
 const routes = Router();
-const keys = {
-  private: path.resolve('jwtRS256.key'),
-  public: path.resolve('jwtRS256.key.pub'),
-};
-
-function logRequest(request: Request, _response: Response, next: NextFunction) {
-  const { method, originalUrl } = request;
-  console.info(method + ': ' + originalUrl);
-  return next();
-}
-
-routes.use(logRequest);
 
 routes.post('/', async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
+    if (!email && !password) {
+      const err = new Error('Email or password not provided!');
+      responseLog(err);
+      return res.status(400).json({ error: err.message });
+    }
+    const { success, error, token } = await auth(email, password);
+    if (!success) {
+      responseLog(error);
+      return res.status(401).json({ error });
+    }
 
-  if (email && password) {
-    const resp = await findClientOrUser(email, password);
-    return resp.auth
-      ? res.json({ token: resp.token })
-      : res.status(401).json(resp.message);
+    responseLog();
+    req.body.token = token;
+    return res.status(200).json({ token });
+  } catch (error) {
+    responseLog(error);
+    return res.status(40).json({ error: error.message });
   }
-
-  return res.status(401).json({ message: 'Empty user' });
 });
 
-async function findClientOrUser(email: string, password: string) {
-  try {
-    const finded = await getRepository(User)
-      .createQueryBuilder('user')
-      .where('user.email = :email', { email: email })
-      .addSelect('user.password')
-      .getOne();
-
-    if (!!finded) {
-      const pwdMatches = bcrypt.compareSync(password, finded.password);
-
-      const privateKey = fs.readFileSync(keys.private, 'utf-8');
-
-      if (pwdMatches) {
-        const { password, ...user } = finded;
-        var token = sign({ ...user }, privateKey, {
-          expiresIn: 300,
-          algorithm: 'RS256',
-        });
-
-        return { auth: true, token: token };
-      }
-      return { auth: false, message: 'Incorrect password' };
-    }
-    return { auth: false, message: 'Invalid user' };
-  } catch (err) {
-    console.log(err);
-    return { auth: false, message: err };
-  }
-}
-
 routes.get('/logout', function (req, res) {
+  req.session.destroy(err => responseLog(err));
   req.logout();
   res.redirect('/');
 });
 
 export { routes as loginRoute };
+function authenticate(
+  email: any,
+  password: any,
+):
+  | { auth: any; error: any; token: any }
+  | PromiseLike<{ auth: any; error: any; token: any }> {
+  throw new Error('Function not implemented.');
+}

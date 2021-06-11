@@ -1,168 +1,105 @@
-import {
-  Router,
-  Request,
-  Response,
-  NextFunction,
-  request,
-  response,
-} from 'express';
+import { request, response, Router } from 'express';
 import { getRepository } from 'typeorm';
-// import Client from '../models/Client';
-import Products from '../models/Products';
+import {
+  getActive,
+  create,
+  getAllBySeller,
+  getOne,
+  update,
+  checkout,
+  replaceOrders,
+} from '../functions/Troller';
 import Troller from '../models/Troller';
-import User from '../models/User';
-import CreateProductsService from '../services/Products.service';
-
-import CreateTrollerService from '../services/Troller.service';
-import getTrollerActive from './User.route';
 
 const routes = Router();
 
-function logRequest(request: Request, _response: Response, next: NextFunction) {
-  const { method, originalUrl } = request;
-  console.info(method + ': ' + originalUrl);
-  return next();
-}
-
-routes.use(logRequest);
-
-routes.post('/', async (request, response) => {
-  try {
-    const req = request.body;
-
-    const trollerService = new CreateTrollerService();
-
-    const troller = await trollerService.execute({ ...req });
-
-    return response.json(troller);
-  } catch (err) {
-    // log erro
-    console.error(err);
-    return response.status(400).json({ error: err.message });
+routes.post('/', async (req, res) => {
+  const body = req.body as Troller;
+  const { status, error, troller } = await create(body);
+  if (status !== 200) {
+    return res.status(status).json({ error });
   }
+
+  return res.status(status).json(troller);
 });
 
-routes.get('/empty', async (_request, response) => {
-  try {
-    const trollerRepository = getRepository(Troller);
+routes.get('/active', async (req, res) => {
+  const id = req.query.id as string | undefined;
+  const { status, error, troller } = await getActive(id);
 
-    const emptyTroller = await trollerRepository.findOne({
-      where: { user: { id: null } },
-    });
+  if (status !== 200) {
+    return res.status(status).json({ error });
+  }
 
-    if (!emptyTroller) {
-      const trollerService = new CreateTrollerService();
+  return res.status(status).json(troller);
+});
 
-      const troller = await trollerService.execute({});
-      return response.json(troller);
-    }
+routes.get('/seller/:id', async (req, res) => {
+  const { id } = req.params;
+  const { status, error, trollers } = await getAllBySeller(id);
 
-    return response.json(emptyTroller);
-  } catch (error) {}
+  if (status !== 200) {
+    return res.status(status).json({ error });
+  }
+
+  return res.status(status).json(trollers);
 });
 
 routes.get('/:id', async (request, response) => {
-  try {
-    const { id } = request.params;
+  const { id } = request.params;
+  const { status, error, troller } = await getOne(id);
 
-    const trollerRepository = getRepository(Troller);
-    const troller = await trollerRepository.find({
-      where: { user: { id }, active: true },
-    });
-
-    return response.json(troller);
-  } catch (err) {
-    console.error(err);
-    return response.status(400).json({ error: err.message });
+  if (status !== 200) {
+    return response.status(status).json({ error });
   }
+
+  return response.status(status).json(troller);
 });
 
-routes.get('/user/:id', async (request, response) => {
-  try {
-    const { id } = request.params;
-    const trollerActive = await getTrollerActive(id);
+routes.get('/all/:userId', async (request, response) => {
+  const { userId } = request.params;
 
-    if (!!trollerActive?.error) {
-      response.status(400).json({ error: trollerActive.error });
-    }
-
-    if (trollerActive?.troller?.length === 0) {
-      const trollerService = new CreateTrollerService();
-      const troller = await trollerService.execute({
-        user: trollerActive?.user,
-      });
-
-      return response.json(troller);
-    }
-    return response.json(trollerActive.troller);
-  } catch (err) {
-    console.error(err);
-    return response.status(400).json({ error: err.message });
-  }
+  // voltar no getAll
 });
 
 routes.put('/:id', async (request, response) => {
-  try {
-    const { id } = request.params;
-    const {
-      products,
-      user,
-      active,
-    }: {
-      products?: Products[];
-      user?: User;
-      active?: boolean;
-    } = request.body;
+  const { id } = request.params;
+  const body = request.body as Troller;
+  const { status, error, troller } = await update(id, body);
 
-    const productsService = new CreateProductsService();
-    const newProducts: Products[] = [];
-    const newTroller = { products, active, user };
-    // const newTroller = { products, active, client };
-
-    if (products !== undefined) {
-      for (let i = 0; i < products.length; i++) {
-        const currentProduct = products[i];
-        const newProduct = await productsService.execute({
-          product: currentProduct.product,
-          quantity: currentProduct.quantity,
-        });
-        console.log(newProduct);
-        newProducts.push(newProduct);
-      }
-      newTroller.products = newProducts;
-      console.log(newProducts);
-    }
-
-    const trollerRepository = getRepository(Troller);
-
-    await trollerRepository.update(id, {
-      ...newTroller,
-    });
-
-    const updateTroller = await trollerRepository.findByIds([id]);
-
-    return response.json(updateTroller);
-  } catch (err) {
-    console.error(err);
-    return response.status(400).json({ error: err.message });
+  if (status !== 200) {
+    return response.status(status).json({ error });
   }
+
+  return response.status(status).json(troller);
+});
+
+routes.put('/replaceOrder/:id', async (request, response) => {
+  const { id } = request.params;
+  const body = request.body as Troller;
+  const { status, error, troller } = await replaceOrders(id, body);
+
+  if (status !== 200) {
+    return response.status(status).json({ error });
+  }
+
+  return response.status(status).json(troller);
+});
+
+routes.put('/checkout/:id', async (request, response) => {
+  const { id } = request.params;
+  // const paymentInfo = request.body as Payment;
+  const paymentInfo = request.body;
+
+  const { status, error } = await checkout(id, paymentInfo);
+
+  if (!!error) {
+    return response.status(status).json({ error });
+  }
+  return response.status(status).end();
 });
 
 routes.delete('/:id', async (request, response) => {
-  try {
-    const { id } = request.params;
-
-    const trollerRepository = getRepository(Troller);
-    await trollerRepository.update(id, { active: false });
-
-    return response.status(204).json();
-  } catch (err) {
-    console.error(err);
-    return response.status(400).json({ error: err.message });
-  }
-});
-
-routes.delete('/exclude/:id', async (request, response) => {
   try {
     const { id } = request.params;
 

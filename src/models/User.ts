@@ -9,12 +9,14 @@ import {
   UpdateDateColumn,
   JoinColumn,
   OneToMany,
+  Check,
 } from 'typeorm';
-import { userRoute } from '../routes/User.route';
 
 import Fair from './Fair';
+import OrderToSeller from './OrderToSeller';
 import Troller from './Troller';
 
+// @Check(`'role' = 'buyer' AND 'zipcode' <> null AND address <> null`)
 @Entity('user')
 export default class User {
   @PrimaryGeneratedColumn('uuid')
@@ -54,15 +56,21 @@ export default class User {
   })
   updateAt: Date;
 
-  @ManyToOne(() => Fair, fair => fair.users, {
-    nullable: true,
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'fair_id' })
-  fair: Fair;
-
   @OneToMany(() => Troller, troller => troller.user, { nullable: true })
   trollers: Troller[];
+
+  @OneToMany(() => OrderToSeller, orderSeller => orderSeller.user, {
+    nullable: true,
+  })
+  orderSellers: OrderToSeller[];
+
+  @ManyToOne(() => Fair, fair => fair.users, {
+    nullable: true,
+    eager: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn([{ name: 'fair_id', referencedColumnName: 'id' }])
+  fair: Fair;
 
   @BeforeInsert()
   createDates() {

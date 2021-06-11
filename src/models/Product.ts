@@ -9,10 +9,12 @@ import {
   ManyToOne,
   JoinColumn,
   OneToOne,
+  OneToMany,
+  ManyToMany,
 } from 'typeorm';
 import { Type } from '../enum/Type';
 import Fair from './Fair';
-import Products from './Products';
+import OrderItem from './OrderItem';
 
 @Entity('product')
 export default class Product {
@@ -22,8 +24,14 @@ export default class Product {
   @Column()
   name: string;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', default: 0 })
   price: number;
+
+  @Column({ name: 'count_in_stock', nullable: true })
+  countInStock: number;
+
+  @Column({ name: 'units_of_measure' })
+  unitsOfMeasure: string;
 
   @Column({ nullable: true })
   description: string;
@@ -31,12 +39,17 @@ export default class Product {
   @Column({ type: 'enum', enum: Type })
   type: Type;
 
-  @ManyToOne(() => Fair, fair => fair.products, { nullable: false })
-  @JoinColumn({ name: 'fair_id' })
+  @Column({ nullable: true })
+  image: string;
+
+  @ManyToOne(() => Fair, fair => fair.products, {
+    nullable: false,
+  })
+  @JoinColumn([{ name: 'fair_id', referencedColumnName: 'id' }])
   fair: Fair;
 
-  @OneToOne(() => Products, products => products.product)
-  products: Products;
+  @OneToMany(() => OrderItem, orderItems => orderItems.product)
+  orderItems: OrderItem[];
 
   @CreateDateColumn({
     name: 'create_at',

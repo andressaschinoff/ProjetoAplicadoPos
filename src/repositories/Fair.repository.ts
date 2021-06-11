@@ -1,4 +1,5 @@
 import { EntityRepository, Repository, Like, MoreThan, In } from 'typeorm';
+import { responseLog } from '../functions/Logs';
 
 import Fair from '../models/Fair';
 
@@ -19,7 +20,7 @@ class FairRepository extends Repository<Fair> {
       });
       return fairs || null;
     } catch (error) {
-      console.error(error);
+      responseLog(error);
       return null;
     }
   }
@@ -31,7 +32,7 @@ class FairRepository extends Repository<Fair> {
       });
       return fairs || null;
     } catch (error) {
-      console.error(error);
+      responseLog(error);
       return null;
     }
   }

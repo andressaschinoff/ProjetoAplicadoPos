@@ -5,12 +5,15 @@ import Fair from '../models/Fair';
 import Product from '../models/Product';
 import ProductRepository from '../repositories/Product.repository';
 
-interface Request {
+export interface ProductRequest {
   name: string;
   price: number;
-  description: string;
+  description?: string;
+  countInStock?: number;
+  image?: string;
   type: Type;
   fair: Fair;
+  unitsOfMeasure: string;
 }
 
 class CreateProductService {
@@ -20,7 +23,10 @@ class CreateProductService {
     description,
     type,
     fair,
-  }: Request): Promise<Product> {
+    unitsOfMeasure,
+    countInStock,
+    image,
+  }: ProductRequest): Promise<Product> {
     const productsRepository = getCustomRepository(ProductRepository);
 
     const product = productsRepository.create({
@@ -29,6 +35,9 @@ class CreateProductService {
       description,
       type,
       fair,
+      countInStock,
+      image,
+      unitsOfMeasure,
     });
     await productsRepository.save(product);
     return product;
