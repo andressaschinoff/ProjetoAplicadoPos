@@ -49,7 +49,7 @@ async function create(fairId: string, body: ProductRequest) {
       return { status: 400, error: err.message };
     }
 
-    const product = await productService.execute({ ...body, fair: fair });
+    const product = await productService.execute({ ...body }, fair);
 
     responseLog(undefined, product);
     return { status: 200, product };

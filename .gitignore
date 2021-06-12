@@ -118,3 +118,5 @@ passportconfig.ts
 *.key
 
 .vscode
+
+current.*.json

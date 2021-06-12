@@ -12,21 +12,22 @@ export interface ProductRequest {
   countInStock?: number;
   image?: string;
   type: Type;
-  fair: Fair;
   unitsOfMeasure: string;
 }
 
 class CreateProductService {
-  public async execute({
-    name,
-    price,
-    description,
-    type,
-    fair,
-    unitsOfMeasure,
-    countInStock,
-    image,
-  }: ProductRequest): Promise<Product> {
+  public async execute(
+    {
+      name,
+      price,
+      description,
+      type,
+      unitsOfMeasure,
+      countInStock,
+      image,
+    }: ProductRequest,
+    fair: Fair,
+  ): Promise<Product> {
     const productsRepository = getCustomRepository(ProductRepository);
 
     const product = productsRepository.create({

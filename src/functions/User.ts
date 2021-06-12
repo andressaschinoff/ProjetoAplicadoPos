@@ -29,7 +29,7 @@ async function create(data: UserRequest) {
     return { status: 200, user: newUser };
   } catch (err) {
     responseLog();
-    return { status: 400, error: err.message };
+    return { status: 410, error: err.message };
   }
 }
 
@@ -122,19 +122,27 @@ async function getByEmailWithPass(email: string) {
   }
 }
 
-async function getAllByFair(fairId: string) {
+async function getByFair(fairId: string) {
   try {
     const repository = getRepository(User);
-    const sellers = await repository.find({ where: { fair: { fairId } } });
 
-    if (!sellers) {
+    // const troller = await trollerRepository
+    //   .createQueryBuilder('troller')
+    //   .leftJoinAndSelect('troller.user', 'user')
+    const seller = await repository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.fair', 'fair')
+      .where('fair.id = :id', { id: fairId })
+      .getOne();
+
+    if (!seller) {
       const err = new Error(`Users not found by fair id: ${fairId}!`);
       responseLog(err);
       return { status: 404, error: err.message };
     }
 
-    responseLog(undefined, sellers);
-    return { status: 200, sellers };
+    responseLog(undefined, seller);
+    return { status: 200, seller };
   } catch (error) {
     responseLog(error);
     return { status: 400, error: error.message };
@@ -148,5 +156,5 @@ export {
   update,
   remove,
   getByEmailWithPass,
-  getAllByFair,
+  getByFair,
 };

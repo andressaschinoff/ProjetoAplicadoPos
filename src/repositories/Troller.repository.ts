@@ -49,10 +49,12 @@ class TrollerRepository extends Repository<Troller> {
       const subtotal = orderItems.reduce((acc, curr) => acc + curr.total, 0);
       const total = subtotal + delivery;
 
+      const active = troller.active ? troller.active : true;
+
       await trollerRepo.update(id, {
         fair: current.fair,
         user: current.user,
-        active: troller.active,
+        active,
         subtotal,
         total,
       });

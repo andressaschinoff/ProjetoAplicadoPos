@@ -4,7 +4,7 @@ import Troller from '../models/Troller';
 import TrollerRepository from '../repositories/Troller.repository';
 import CreateTrollerService from '../services/Troller.service';
 import { responseLog } from './Logs';
-import { getOne as getUser, getAllByFair as getAllUsers } from './User';
+import { getOne as getUser, getByFair as getUserByFair } from './User';
 import {
   create as orderItemsRelation,
   deleteAll as deleteAllOrders,
@@ -130,7 +130,7 @@ async function getOne(id: string) {
   }
 }
 
-async function getAll(id: string) {
+async function getAllByUser(id: string) {
   try {
     const { status: userStatus, error: userError, user } = await getUser(id);
 
@@ -146,18 +146,6 @@ async function getAll(id: string) {
       }
 
       return { status, trollers };
-
-      // const userRepository = getRepository(User);
-      // const inactives = await userRepository.find({relations: ['']})
-      // const inactives = await trollerRepository.find({
-      //   relations: ['sellers'],
-      //   where: {sellers: {} },
-      //   // where: { sellers: { id }, active: false },
-      // });
-      // const active = await trollerRepository.find({
-      //   where: { sellers: {}, active: true },
-      // });
-      // return { status: 200, actives, inactives };
     }
 
     const { status, error, trollers } = await getAllByBuyer(id);
@@ -167,15 +155,6 @@ async function getAll(id: string) {
     }
 
     return { status, trollers };
-
-    // const troller = await trollerRepository
-    //   .createQueryBuilder('troller')
-    //   .leftJoinAndSelect('troller.user', 'user')
-    //   .leftJoinAndSelect('troller.fair', 'fair')
-    //   .leftJoinAndSelect('troller.orderItems', 'orderItem')
-    //   .leftJoinAndSelect('orderItem.product', 'product')
-    //   .where('troller.userId = :id', { id: id })
-    //   .getMany();
   } catch (err) {
     responseLog(err);
     return { status: 400, error: err.message };
@@ -187,21 +166,14 @@ async function getAllBySeller(id: string) {
     const repository = getRepository(OrderToSeller);
 
     const inactivesOrders = await repository.find({
-      where: { active: false, troller: { id } },
+      where: { active: false, user: { id } },
     });
     const activesOrders = await repository.find({
-      where: { active: true, troller: { id } },
+      where: { active: true, user: { id } },
     });
 
     const inactives = inactivesOrders.map(({ troller }) => troller);
     const actives = activesOrders.map(({ troller }) => troller);
-
-    // const actives = await repository
-    //   .createQueryBuilder('troller')
-    //   .leftJoinAndSelect('troller.orderSellers', 'orderSeller')
-    //   .where('orderSeller.troller = :troller', { troller: id })
-    //   .andWhere('orderSeller.active = :active', { active: true })
-    //   .getMany();
 
     responseLog(undefined, { trollers: { actives, inactives } });
     return { status: 200, trollers: { actives, inactives } };
@@ -232,6 +204,7 @@ async function getAllByBuyer(id: string) {
 
 async function checkout(id: string, paymentInfo: any) {
   try {
+    const repository = getRepository(Troller);
     const {
       status: currentStatus,
       error: currentError,
@@ -246,22 +219,23 @@ async function checkout(id: string, paymentInfo: any) {
     const {
       status: usersStatus,
       error: usersError,
-      sellers,
-    } = await getAllUsers(fairId);
+      seller,
+    } = await getUserByFair(fairId);
 
-    if (usersStatus !== 200 || !sellers) {
+    if (usersStatus !== 200 || !seller) {
       return { status: usersStatus, error: usersError };
     }
 
-    await orderSellerRelation(sellers, currentTroller);
+    await orderSellerRelation(seller, currentTroller);
 
-    const { status, error } = await update(id, { active: false });
+    await repository.update(id, { active: false });
+    const updated = await repository.findOne({ where: { id } });
 
-    if (status !== 200) {
-      return { status, error };
+    if (!updated) {
+      return { status: 400, error: `Troller ${id} could update.` };
     }
 
-    return { status };
+    return { status: 200, troller: updated };
   } catch (err) {
     responseLog(err);
     return { status: 400, error: err.message };
@@ -270,7 +244,6 @@ async function checkout(id: string, paymentInfo: any) {
 
 async function update(id: string, troller: Troller | Partial<Troller>) {
   try {
-    const { orderItems } = troller;
     const customRepository = getCustomRepository(TrollerRepository);
 
     const {
@@ -282,6 +255,8 @@ async function update(id: string, troller: Troller | Partial<Troller>) {
     if (currentStatus !== 200 || !currentTroller) {
       return { status: currentStatus, error: currentError };
     }
+
+    const { orderItems } = troller;
 
     if (!!orderItems && orderItems.length > 0) {
       await orderItemsRelation(orderItems, currentTroller);
@@ -338,7 +313,7 @@ export {
   getActiveSignOut,
   create,
   getOne,
-  getAllBySeller,
+  getAllByUser,
   update,
   checkout,
   replaceOrders,

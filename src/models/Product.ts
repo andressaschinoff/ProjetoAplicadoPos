@@ -8,9 +8,7 @@ import {
   BeforeUpdate,
   ManyToOne,
   JoinColumn,
-  OneToOne,
   OneToMany,
-  ManyToMany,
 } from 'typeorm';
 import { Type } from '../enum/Type';
 import Fair from './Fair';
@@ -42,9 +40,7 @@ export default class Product {
   @Column({ nullable: true })
   image: string;
 
-  @ManyToOne(() => Fair, fair => fair.products, {
-    nullable: false,
-  })
+  @ManyToOne(() => Fair, fair => fair.products)
   @JoinColumn([{ name: 'fair_id', referencedColumnName: 'id' }])
   fair: Fair;
 

@@ -10,7 +10,6 @@ export interface UserRequest {
   email: string;
   password: string;
   telephone: string;
-  fair?: Fair;
   address?: string;
   zipcode?: string;
   role: string;
@@ -23,7 +22,6 @@ class CreateUserService {
     email,
     password,
     telephone,
-    fair,
     role,
     address,
     zipcode,
@@ -50,7 +48,6 @@ class CreateUserService {
       email,
       password: encriptedPass,
       telephone,
-      fair,
       role,
       address,
       zipcode,

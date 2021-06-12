@@ -1,9 +1,9 @@
-import { request, response, Router } from 'express';
+import { Router } from 'express';
 import { getRepository } from 'typeorm';
 import {
   getActive,
   create,
-  getAllBySeller,
+  getAllByUser,
   getOne,
   update,
   checkout,
@@ -14,8 +14,8 @@ import Troller from '../models/Troller';
 const routes = Router();
 
 routes.post('/', async (req, res) => {
-  const body = req.body as Troller;
-  const { status, error, troller } = await create(body);
+  const { user, ...body } = req.body as Troller;
+  const { status, error, troller } = await create({ user, ...body });
   if (status !== 200) {
     return res.status(status).json({ error });
   }
@@ -24,7 +24,7 @@ routes.post('/', async (req, res) => {
 });
 
 routes.get('/active', async (req, res) => {
-  const id = req.query.id as string | undefined;
+  const id = req.query.id as string;
   const { status, error, troller } = await getActive(id);
 
   if (status !== 200) {
@@ -32,17 +32,6 @@ routes.get('/active', async (req, res) => {
   }
 
   return res.status(status).json(troller);
-});
-
-routes.get('/seller/:id', async (req, res) => {
-  const { id } = req.params;
-  const { status, error, trollers } = await getAllBySeller(id);
-
-  if (status !== 200) {
-    return res.status(status).json({ error });
-  }
-
-  return res.status(status).json(trollers);
 });
 
 routes.get('/:id', async (request, response) => {
@@ -58,8 +47,13 @@ routes.get('/:id', async (request, response) => {
 
 routes.get('/all/:userId', async (request, response) => {
   const { userId } = request.params;
+  const { status, error, trollers } = await getAllByUser(userId);
 
-  // voltar no getAll
+  if (status !== 200) {
+    return response.status(status).json({ error });
+  }
+
+  return response.status(status).json({ trollers });
 });
 
 routes.put('/:id', async (request, response) => {
@@ -91,12 +85,12 @@ routes.put('/checkout/:id', async (request, response) => {
   // const paymentInfo = request.body as Payment;
   const paymentInfo = request.body;
 
-  const { status, error } = await checkout(id, paymentInfo);
+  const { status, troller, error } = await checkout(id, paymentInfo);
 
   if (!!error) {
     return response.status(status).json({ error });
   }
-  return response.status(status).end();
+  return response.status(status).json(troller);
 });
 
 routes.delete('/:id', async (request, response) => {

@@ -40,9 +40,25 @@ routes.get('/:fairId', async (request, response) => {
 
 routes.post('/:fairId', getUserByToken, isSeller, async (request, response) => {
   const { fairId } = request.params;
-  const body = request.body as ProductRequest;
+  const {
+    name,
+    price,
+    type,
+    unitsOfMeasure,
+    countInStock,
+    description,
+    image,
+  } = request.body as Product;
 
-  const { status, error, product } = await create(fairId, body);
+  const { status, error, product } = await create(fairId, {
+    name,
+    price,
+    type,
+    unitsOfMeasure,
+    countInStock,
+    description,
+    image,
+  });
 
   if (status !== 200) {
     return response.status(status).json({ error });

@@ -8,6 +8,7 @@ import {
   BeforeUpdate,
   OneToMany,
   OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Type } from '../enum/Type';
 import Product from './Product';
@@ -52,11 +53,12 @@ export default class Fair {
   @Column({ type: 'enum', array: true, enum: Type })
   types: Type[];
 
+  @OneToOne(() => User)
+  @JoinColumn([{ name: 'user_id', referencedColumnName: 'id' }])
+  user: User;
+
   @OneToMany(() => Product, product => product.fair)
   products: Product[];
-
-  @OneToMany(() => User, user => user.fair)
-  users: User[];
 
   @OneToMany(() => Troller, troller => troller.fair)
   trollers: Troller[];

@@ -29,7 +29,7 @@ async function create(userId: string, body: FairRequest) {
       return { status: 404, error: err.message };
     }
 
-    if (user?.role !== 'seller' || !!user.fair) {
+    if (user?.role !== 'seller') {
       const err = new Error('User not allowed!');
       responseLog(err);
       return { status: 403, error: err.message };
@@ -40,14 +40,6 @@ async function create(userId: string, body: FairRequest) {
     const fair = await newFair.execute({
       ...body,
     });
-
-    await updateUser(userId, { fair });
-    const { user: updatedUser } = await getUser(userId);
-
-    if (!updatedUser?.fair) {
-      const err = new Error('Relation between fair and user didn`t worked!');
-      responseLog(err);
-    }
 
     responseLog(undefined, fair);
     return { status: 200, fair };

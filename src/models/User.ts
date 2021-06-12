@@ -2,14 +2,13 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  ManyToOne,
   BeforeInsert,
   BeforeUpdate,
   CreateDateColumn,
   UpdateDateColumn,
-  JoinColumn,
   OneToMany,
   Check,
+  OneToOne,
 } from 'typeorm';
 
 import Fair from './Fair';
@@ -56,6 +55,9 @@ export default class User {
   })
   updateAt: Date;
 
+  @OneToOne(() => Fair, fair => fair.user)
+  fair: Fair;
+
   @OneToMany(() => Troller, troller => troller.user, { nullable: true })
   trollers: Troller[];
 
@@ -63,14 +65,6 @@ export default class User {
     nullable: true,
   })
   orderSellers: OrderToSeller[];
-
-  @ManyToOne(() => Fair, fair => fair.users, {
-    nullable: true,
-    eager: true,
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn([{ name: 'fair_id', referencedColumnName: 'id' }])
-  fair: Fair;
 
   @BeforeInsert()
   createDates() {

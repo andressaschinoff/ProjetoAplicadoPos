@@ -2,6 +2,7 @@ import { getCustomRepository } from 'typeorm';
 import { Type } from '../enum/Type';
 
 import Fair from '../models/Fair';
+import User from '../models/User';
 import FairRepository from '../repositories/Fair.repository';
 
 export interface FairRequest {
@@ -13,6 +14,7 @@ export interface FairRequest {
   weekdays: string[];
   deliveryPrice: number;
   types: Type[];
+  user: User;
 }
 
 class CreateFairService {
@@ -25,6 +27,7 @@ class CreateFairService {
     weekdays,
     deliveryPrice,
     types,
+    user,
   }: FairRequest): Promise<Fair> {
     const fairRepository = getCustomRepository(FairRepository);
 
@@ -39,6 +42,7 @@ class CreateFairService {
       weekdays: newWeekdays,
       deliveryPrice,
       types,
+      user,
     });
 
     await fairRepository.save(fair);

@@ -19,7 +19,7 @@ routes.post('/', async (req, res) => {
     }
 
     responseLog();
-    req.body.token = token;
+    // req.body.token = token;
     return res.status(200).json({ token });
   } catch (error) {
     responseLog(error);

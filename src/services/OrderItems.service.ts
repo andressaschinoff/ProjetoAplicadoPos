@@ -66,6 +66,15 @@ class CreateOrderItemsService {
     });
 
     await orderItemRepo.save(newOrderItems);
+
+    const created = orderItemRepo.findOne({ id: newOrderItems.id });
+
+    if (!created) {
+      const err = new Error(
+        `Relation between troller ${troller.id} and order item not established.`,
+      );
+      responseLog(err);
+    }
   }
 }
 

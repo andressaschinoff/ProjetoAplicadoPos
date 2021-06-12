@@ -54,9 +54,6 @@
             "schema": {
               "type": "object",
               "properties": {
-                "token": {
-                  "example": "any"
-                },
                 "email": {
                   "example": "any"
                 },
@@ -141,6 +138,36 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "obj",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "example": "any"
+                },
+                "price": {
+                  "example": "any"
+                },
+                "type": {
+                  "example": "any"
+                },
+                "unitsOfMeasure": {
+                  "example": "any"
+                },
+                "countInStock": {
+                  "example": "any"
+                },
+                "description": {
+                  "example": "any"
+                },
+                "image": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
@@ -265,7 +292,41 @@
       "post": {
         "tags": [],
         "description": "",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "address": {
+                  "example": "any"
+                },
+                "closing": {
+                  "example": "any"
+                },
+                "deliveryPrice": {
+                  "example": "any"
+                },
+                "name": {
+                  "example": "any"
+                },
+                "opening": {
+                  "example": "any"
+                },
+                "types": {
+                  "example": "any"
+                },
+                "weekdays": {
+                  "example": "any"
+                },
+                "zipcode": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
         "responses": {
           "400": {
             "description": "Bad Request"
@@ -450,7 +511,41 @@
       "post": {
         "tags": [],
         "description": "",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "cpf": {
+                  "example": "any"
+                },
+                "email": {
+                  "example": "any"
+                },
+                "name": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                },
+                "role": {
+                  "example": "any"
+                },
+                "telephone": {
+                  "example": "any"
+                },
+                "address": {
+                  "example": "any"
+                },
+                "zipcode": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
         "responses": {
           "400": {
             "description": "Bad Request"
@@ -653,6 +748,28 @@
         "parameters": [
           {
             "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/troller/replaceOrder/{id}": {
+      "put": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
             "in": "path",
             "required": true,
             "type": "string"

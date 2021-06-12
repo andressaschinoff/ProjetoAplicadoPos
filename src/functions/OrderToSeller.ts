@@ -1,34 +1,18 @@
-import { getRepository } from 'typeorm';
-import OrderToSeller from '../models/OrderToSeller';
 import Troller from '../models/Troller';
 import User from '../models/User';
+import CreateOrderSellerService from '../services/OrderSeller.service';
 import { responseLog } from './Logs';
 
-async function create(sellers: User[], troller: Troller) {
+async function create(seller: User, troller: Troller) {
   try {
-    const repository = getRepository(OrderToSeller);
+    const service = new CreateOrderSellerService();
 
-    for (const seller of sellers) {
-      const orderNumber = getOrderNumber();
+    const orderNumber = getOrderNumber();
 
-      const created = repository.create({
-        orderNumber,
-        troller,
-        user: seller,
-      });
-
-      await repository.save(created);
-
-      const found = repository.findOne({ id: created.id });
-
-      if (!found) {
-        const err = new Error(
-          `Relation between seller id ${seller.id} and order id ${troller.id} not established.`,
-        );
-        responseLog(err);
-      }
-      responseLog(undefined, found);
-    }
+    await service.execute({ orderNumber, troller, seller });
+    responseLog(undefined, {
+      orderItems: 'Relation between order and seller succeeded.',
+    });
   } catch (error) {
     responseLog(error);
     throw error;

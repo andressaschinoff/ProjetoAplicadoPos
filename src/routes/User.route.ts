@@ -21,8 +21,26 @@ routes.get('/', async (_request, response) => {
 });
 
 routes.post('/', async (request, response) => {
-  const data = request.body as UserRequest;
-  const { status, error, user } = await create(data);
+  const {
+    cpf,
+    email,
+    name,
+    password,
+    role,
+    telephone,
+    address,
+    zipcode,
+  } = request.body as UserRequest;
+  const { status, error, user } = await create({
+    cpf,
+    email,
+    name,
+    password,
+    role,
+    telephone,
+    address,
+    zipcode,
+  });
 
   if (status !== 200) {
     return response.status(status).json({ error });

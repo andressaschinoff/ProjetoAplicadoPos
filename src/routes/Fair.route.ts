@@ -26,9 +26,28 @@ routes.get('/', async (_request, response) => {
 });
 
 routes.post('/', getUserByToken, isSeller, async (request, response) => {
-  const body = request.body as FairRequest;
+  const {
+    address,
+    closing,
+    deliveryPrice,
+    name,
+    opening,
+    types,
+    weekdays,
+    zipcode,
+  } = request.body as FairRequest;
   const user = request.user as User;
-  const { status, error, fair } = await create(user.id, body);
+  const { status, error, fair } = await create(user.id, {
+    address,
+    closing,
+    deliveryPrice,
+    name,
+    opening,
+    types,
+    user,
+    weekdays,
+    zipcode,
+  });
 
   if (status !== 200) {
     return response.status(status).json({ error });
