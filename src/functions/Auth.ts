@@ -58,13 +58,18 @@ async function auth(email: string, password: string) {
 }
 
 const getUserByToken = (req: Request, res: Response, next: NextFunction) => {
-  const bearerHeader = req.headers.authorization;
+  // const bearerHeader = req.headers.authorization;
+  const token = req.cookies.token;
+  console.log(token);
 
-  if (!bearerHeader) {
+  // if (!bearerHeader) {
+  //   return res.status(401).json({ error: 'User not loged!' });
+  // }
+  if (!token) {
     return res.status(401).json({ error: 'User not loged!' });
   }
 
-  const token = bearerHeader?.split(' ')[1];
+  // const token = bearerHeader?.split(' ')[1];
   verify(token, privateKey, { algorithms: ['RS256'] }, (err, decode) => {
     if (err) {
       return res.status(400).json({ error: err.message });

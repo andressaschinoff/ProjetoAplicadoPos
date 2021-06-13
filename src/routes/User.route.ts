@@ -86,43 +86,4 @@ routes.delete('/:id', async (request, response) => {
   return response.status(status).end();
 });
 
-// export async function getTrollerActive(id: string) {
-//   try {
-//     const userRepository = getRepository(User);
-//     const user = await userRepository.findOne({
-//       relations: ['trollers'],
-//       where: { id },
-//     });
-
-//     if (!user) {
-//       throw new Error(`Don't have user id ${id}`);
-//     }
-
-//     const troller = user?.trollers.filter(({ active }) => active === true);
-
-//     return { troller, user };
-//   } catch (err) {
-//     console.error(err);
-//     return { error: err.message };
-//   }
-// }
-
-// export async function getAllTrollers(id: string) {
-//   try {
-//     const userRepository = getRepository(User);
-//     const user = await userRepository.findOne({
-//       relations: ['trollers'],
-//       where: { id },
-//     });
-
-//     if (!user) {
-//       throw new Error(`Don't have user id ${id}`);
-//     }
-//     return { user };
-//   } catch (err) {
-//     console.error(err);
-//     return { error: err.message };
-//   }
-// }
-
 export { routes as userRoute };

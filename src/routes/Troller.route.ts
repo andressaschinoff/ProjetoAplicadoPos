@@ -53,7 +53,7 @@ routes.get('/all/:userId', async (request, response) => {
     return response.status(status).json({ error });
   }
 
-  return response.status(status).json({ trollers });
+  return response.status(status).json({ ...trollers });
 });
 
 routes.put('/:id', async (request, response) => {
