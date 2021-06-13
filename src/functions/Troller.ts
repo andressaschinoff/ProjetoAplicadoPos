@@ -172,8 +172,12 @@ async function getAllBySeller(id: string) {
       where: { active: true, user: { id } },
     });
 
-    const inactives = inactivesOrders.map(({ troller }) => troller);
-    const actives = activesOrders.map(({ troller }) => troller);
+    const inactives = inactivesOrders.map(({ troller, orderNumber }) => {
+      return { ...troller, orderNumber };
+    });
+    const actives = activesOrders.map(({ troller, orderNumber }) => {
+      return { ...troller, orderNumber };
+    });
 
     responseLog(undefined, { trollers: { actives, inactives } });
     return { status: 200, trollers: { actives, inactives } };

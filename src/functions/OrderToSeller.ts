@@ -20,10 +20,11 @@ async function create(seller: User, troller: Troller) {
 }
 
 function getOrderNumber() {
-  const sixNum = Math.floor(Math.random() * 100000);
-  const fourNum = Math.floor(Math.random() * 1000);
+  const first = Math.floor(Math.random() * 1000);
+  const second = Math.floor(Math.random() * 100000);
+  const third = Math.floor(Math.random() * 1000);
   const date = Date.now();
-  return `${fourNum}-${sixNum}-${fourNum}-${date}`;
+  return `${first}-${second}-${third}-${date}`;
 }
 
 export { create };
