@@ -27,7 +27,7 @@ class TrollerRepository extends Repository<Troller> {
 
       const { user } = troller;
 
-      if (!currentUser && !!user) {
+      if (!currentUser && !!user && user.role === 'buyer') {
         current.user = user;
       }
 

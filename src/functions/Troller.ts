@@ -256,7 +256,25 @@ async function update(id: string, troller: Troller | Partial<Troller>) {
       return { status: currentStatus, error: currentError };
     }
 
-    const { orderItems } = troller;
+    const { orderItems, user } = troller;
+
+    if (!!user) {
+      const {
+        status: userStatus,
+        error: userError,
+        user: foundUser,
+      } = await getUser(user.id);
+
+      if (userStatus !== 200 || !foundUser) {
+        return { status: userStatus, error: userError };
+      }
+
+      const { troller: activeTroller } = await getActiveByUser(foundUser.id);
+
+      if (!!activeTroller && activeTroller.id !== id) {
+        await customRepository.update(activeTroller.id, { active: false });
+      }
+    }
 
     if (!!orderItems && orderItems.length > 0) {
       await orderItemsRelation(orderItems, currentTroller);
