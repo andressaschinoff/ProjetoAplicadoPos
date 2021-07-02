@@ -66,9 +66,6 @@
         ],
         "responses": {
           "40": {},
-          "200": {
-            "description": "OK"
-          },
           "400": {
             "description": "Bad Request"
           },
@@ -641,28 +638,6 @@
           {
             "name": "id",
             "in": "query",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      }
-    },
-    "/api/troller/seller/{id}": {
-      "get": {
-        "tags": [],
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
             "type": "string"
           }
         ],

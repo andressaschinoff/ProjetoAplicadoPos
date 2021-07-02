@@ -7,7 +7,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
-  Check,
   OneToOne,
 } from 'typeorm';
 
@@ -15,7 +14,6 @@ import Fair from './Fair';
 import OrderToSeller from './OrderToSeller';
 import Troller from './Troller';
 
-// @Check(`'role' = 'buyer' AND 'zipcode' <> null AND address <> null`)
 @Entity('user')
 export default class User {
   @PrimaryGeneratedColumn('uuid')

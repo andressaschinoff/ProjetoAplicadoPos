@@ -172,8 +172,12 @@ async function getAllBySeller(id: string) {
       where: { active: true, user: { id } },
     });
 
-    const inactives = inactivesOrders.map(({ troller }) => troller);
-    const actives = activesOrders.map(({ troller }) => troller);
+    const inactives = inactivesOrders.map(({ troller, orderNumber }) => {
+      return { ...troller, orderNumber };
+    });
+    const actives = activesOrders.map(({ troller, orderNumber }) => {
+      return { ...troller, orderNumber };
+    });
 
     responseLog(undefined, { trollers: { actives, inactives } });
     return { status: 200, trollers: { actives, inactives } };
@@ -256,7 +260,25 @@ async function update(id: string, troller: Troller | Partial<Troller>) {
       return { status: currentStatus, error: currentError };
     }
 
-    const { orderItems } = troller;
+    const { orderItems, user } = troller;
+
+    if (!!user) {
+      const {
+        status: userStatus,
+        error: userError,
+        user: foundUser,
+      } = await getUser(user.id);
+
+      if (userStatus !== 200 || !foundUser) {
+        return { status: userStatus, error: userError };
+      }
+
+      const { troller: activeTroller } = await getActiveByUser(foundUser.id);
+
+      if (!!activeTroller && activeTroller.id !== id) {
+        await customRepository.update(activeTroller.id, { active: false });
+      }
+    }
 
     if (!!orderItems && orderItems.length > 0) {
       await orderItemsRelation(orderItems, currentTroller);

@@ -114,7 +114,7 @@ async function getByEmailWithPass(email: string) {
       return { status: 404, error: err.message };
     }
 
-    responseLog(undefined, user);
+    responseLog(undefined, { user: { id: user.id } });
     return { status: 200, user };
   } catch (error) {
     responseLog(error);
@@ -125,10 +125,6 @@ async function getByEmailWithPass(email: string) {
 async function getByFair(fairId: string) {
   try {
     const repository = getRepository(User);
-
-    // const troller = await trollerRepository
-    //   .createQueryBuilder('troller')
-    //   .leftJoinAndSelect('troller.user', 'user')
     const seller = await repository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.fair', 'fair')

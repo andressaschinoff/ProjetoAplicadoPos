@@ -13,14 +13,16 @@ routes.post('/', async (req, res) => {
       return res.status(400).json({ error: err.message });
     }
     const { success, error, token } = await auth(email, password);
-    if (!success) {
+    if (!success || !token) {
       responseLog(error);
       return res.status(401).json({ error });
     }
 
     responseLog();
-    // req.body.token = token;
-    return res.status(200).json({ token });
+    return res.json({ token }).writeHead(200, {
+      'Set-Cookie': `token=${token}; HttpOnly`,
+      'Access-Control-Allow-Credentials': 'true',
+    });
   } catch (error) {
     responseLog(error);
     return res.status(40).json({ error: error.message });
@@ -28,8 +30,13 @@ routes.post('/', async (req, res) => {
 });
 
 routes.get('/logout', function (req, res) {
-  req.session.destroy(err => responseLog(err));
   req.logout();
+  res
+    .writeHead(200, {
+      'Set-Cookie': '',
+      'Access-Control-Allow-Credentials': 'true',
+    })
+    .send();
   res.redirect('/');
 });
 

@@ -34,9 +34,7 @@ async function create(userId: string, body: FairRequest) {
       responseLog(err);
       return { status: 403, error: err.message };
     }
-    // const id = sessionStorage.getItem()
     const newFair = new CreateFairService();
-
     const fair = await newFair.execute({
       ...body,
     });

@@ -6,19 +6,13 @@ import ProductRepository from '../repositories/Product.repository';
 import { responseLog } from '../functions/Logs';
 
 interface Request {
-  id?: string;
   quantity: number;
   product: Product;
   troller: Troller;
 }
 
 class CreateOrderItemsService {
-  public async execute({
-    id,
-    quantity,
-    product,
-    troller,
-  }: Request): Promise<void> {
+  public async execute({ quantity, product, troller }: Request): Promise<void> {
     const orderItemRepo = getRepository(OrderItem);
     const productRepository = getCustomRepository(ProductRepository);
 
@@ -30,51 +24,45 @@ class CreateOrderItemsService {
       throw new Error(`Error while looking for product id ${product.id}`);
     }
 
-    if (!!id) {
-      const orderItem = await orderItemRepo.findOne({
-        where: { id },
-      });
-      if (!!orderItem) {
-        const qty = quantity + orderItem.quantity;
-        const total = findedProd.price * qty;
-        await orderItemRepo.update(orderItem.id, {
-          quantity: qty,
-          total: total,
-        });
-        return;
-      }
-    }
-
     const order = await orderItemRepo.findOne({
       where: { product: { id: product.id }, troller: { id: troller.id } },
       relations: ['troller'],
     });
 
-    if (!!order) {
-      const qty = order.quantity + quantity;
-      const total = findedProd.price * qty;
-      await orderItemRepo.update(order.id, { quantity: qty, total });
+    if (!order) {
+      if (quantity <= 0) {
+        return;
+      }
+      const total = quantity * findedProd.price;
+      const newOrderItems = orderItemRepo.create({
+        quantity,
+        total,
+        product: findedProd,
+        troller,
+      });
+
+      await orderItemRepo.save(newOrderItems);
+
+      const created = orderItemRepo.findOne({ id: newOrderItems.id });
+
+      if (!created) {
+        const err = new Error(
+          `Relation between troller ${troller.id} and order item not established.`,
+        );
+        responseLog(err);
+      }
       return;
     }
 
-    const total = quantity * findedProd.price;
-    const newOrderItems = orderItemRepo.create({
-      quantity,
-      total,
-      product: findedProd,
-      troller,
-    });
+    const qty = order.quantity + quantity;
 
-    await orderItemRepo.save(newOrderItems);
-
-    const created = orderItemRepo.findOne({ id: newOrderItems.id });
-
-    if (!created) {
-      const err = new Error(
-        `Relation between troller ${troller.id} and order item not established.`,
-      );
-      responseLog(err);
+    if (qty <= 0) {
+      await orderItemRepo.delete(order.id);
+      return;
     }
+
+    const total = findedProd.price * qty;
+    await orderItemRepo.update(order.id, { quantity: qty, total });
   }
 }
 

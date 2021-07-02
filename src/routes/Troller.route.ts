@@ -53,7 +53,7 @@ routes.get('/all/:userId', async (request, response) => {
     return response.status(status).json({ error });
   }
 
-  return response.status(status).json({ trollers });
+  return response.status(status).json({ ...trollers });
 });
 
 routes.put('/:id', async (request, response) => {
@@ -82,7 +82,6 @@ routes.put('/replaceOrder/:id', async (request, response) => {
 
 routes.put('/checkout/:id', async (request, response) => {
   const { id } = request.params;
-  // const paymentInfo = request.body as Payment;
   const paymentInfo = request.body;
 
   const { status, troller, error } = await checkout(id, paymentInfo);
