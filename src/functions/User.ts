@@ -125,10 +125,6 @@ async function getByEmailWithPass(email: string) {
 async function getByFair(fairId: string) {
   try {
     const repository = getRepository(User);
-
-    // const troller = await trollerRepository
-    //   .createQueryBuilder('troller')
-    //   .leftJoinAndSelect('troller.user', 'user')
     const seller = await repository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.fair', 'fair')

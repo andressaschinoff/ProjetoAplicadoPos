@@ -7,9 +7,6 @@ import { UserRequest } from '../services/User.service';
 
 const routes = Router();
 
-// pensar soobre auth
-
-// routes.get('/', getUserByToken, async (_request, response) => {
 routes.get('/', async (_request, response) => {
   const { status, error, users } = await getAll();
 
@@ -50,7 +47,6 @@ routes.post('/', async (request, response) => {
 });
 
 routes.get('/:id', async (request, response) => {
-  // routes.get('/:id', getUserByToken, async (request, response) => {
   const { id } = request.params;
   const { status, error, user } = await getOne(id);
 
@@ -61,7 +57,6 @@ routes.get('/:id', async (request, response) => {
   return response.status(status).json(user);
 });
 
-// routes.put('/:id', getUserByToken, async (request, response) => {
 routes.put('/:id', async (request, response) => {
   const { id } = request.params;
   const body = request.body as Partial<User> | User;
@@ -74,7 +69,6 @@ routes.put('/:id', async (request, response) => {
   return response.status(status).json(user);
 });
 
-// routes.delete('/:id', getUserByToken, async (request, response) => {
 routes.delete('/:id', async (request, response) => {
   const { id } = request.params;
   const { status, error } = await remove(id);

@@ -23,8 +23,6 @@ routes.post('/', async (req, res) => {
       'Set-Cookie': `token=${token}; HttpOnly`,
       'Access-Control-Allow-Credentials': 'true',
     });
-
-    // return res.status(200).json({ token });
   } catch (error) {
     responseLog(error);
     return res.status(40).json({ error: error.message });
